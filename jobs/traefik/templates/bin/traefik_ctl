@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+mkdir -p /var/vcap/data/sys/log/traefik
+chown vcap:vcap /var/vcap/data/sys/log/traefik
+
+# Persistent storage init
+mkdir -p /var/vcap/store/traefik/acme
+chown vcap:vcap /var/vcap/store/traefik/acme
+chmod 700 /var/vcap/store/traefik/acme
+
+
+chmod 600 /var/vcap/jobs/traefik/tls/*.key
+
+
+case $1 in
+    start)
+        mkdir -p /var/vcap/data/sys/run/traefik
+        echo $$ > /var/vcap/data/sys/run/traefik/traefik.pid
+
+        exec chpst -u vcap:vcap \
+            /var/vcap/packages/traefik/bin/traefik \
+            -c /var/vcap/jobs/traefik/conf/traefik.toml
+        ;;
+    stop)
+        kill "$(cat /var/vcap/data/sys/run/traefik/traefik.pid)"
+        rm -f /var/vcap/data/sys/run/traefik/traefik.pid
+        ;;
+    *)
+        echo "Usage: $(basename "$0") <start|stop>" >&2
+        exit 2
+        ;;
+esac

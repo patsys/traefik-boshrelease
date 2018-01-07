@@ -1,0 +1,167 @@
+---
+name: traefik
+
+description: This job runs a Traefik reverse-proxy.
+
+templates:
+  bin/traefik_ctl: bin/traefik_ctl
+  conf/traefik.toml: conf/traefik.toml
+
+packages:
+  - traefik
+
+properties:
+  traefik.debug:
+    description: |
+      Whether to enable debug mode.
+    default: false
+  traefik.log_level:
+    description: |
+      The level of details in Traefik logs.
+
+      Possible values are:
+      - DEBUG (the most verbose level)
+      - INFO
+      - WARN
+      - ERROR
+      - FATAL
+      - PANIC (the least verbose level)
+    default: INFO
+  traefik.access_logs.enabled:
+    description: |
+      Whether to activate the access logs. This will produce one line for each
+      access to the traefik server. This might generate high volume of data
+      under high loads.
+    default: true
+
+  traefik.accept_invalid_backend_certificates:
+    description: |
+      Whether invalid SSL certificates are accepted for backends.
+
+      This disables detection of man-in-the-middle attacks so should be used
+      on trusted backend networks only.
+    default: false
+
+  traefik.http.enabled:
+    description: |
+      Whether to activate the HTTP entrypoint.
+    default: false
+  traefik.http.port:
+    description: |
+      TCP port for the HTTP entrypoint.
+    default: 80
+
+  traefik.tls.enabled:
+    description: |
+      Whether to activate the HTTPS entrypoint.
+    default: true
+  traefik.tls.port:
+    description: |
+      TCP port for the HTTPS entrypoint.
+    default: 443
+  traefik.tls.cert:
+    type: certificate
+    description: |
+      The default TLS certificate to present on HTTPS entrypoint.
+
+  traefik.acme.enabled:
+    description: |
+      Whether to activate automatic Let's Encrypt certificates.
+    default: false
+
+  traefik.acme.certs_email:
+    description: |
+      Email address used for ACME certificate registration.
+
+      This address will receive expiration notice emails before certificates
+      will expire. Please note that Traefik automatically renew those
+      certificates before they actually expire. So you usually need not take
+      action uppon receiving expiration notice when running Traefik.
+    example: acme-certs-contact@example.com
+
+  traefik.acme.staging:
+    description: |
+      Run on the staging Let's Encrypt server.
+
+      This is recommended for a first start because the Let's Encrypt
+      production server enforces restrictive quotas that you can easily hit in
+      case you have any configuration issue. That's why you first need to
+      first validate your setup with the staging server before switching to
+      the production server.
+    default: true
+
+  traefik.web.enabled:
+    description: |
+      Whether the 'web' backend should be enabled.
+
+      This will enable a REST API endpoint and a web UI that can be used to
+      dynamically read or modify the Traefik configuration. Please take great
+      care not exposing this endpoint to the entire Internet, otherwise your
+      server could get compromized by malicious users.
+    default: false
+  traefik.web.readonly:
+    description: |
+      Whether the 'web' endpoint should be readonly, in which case the Traefik
+      configuration can only be read and not modified through this backend.
+    default: true
+  traefik.web.port:
+    description: TCP port for the 'web' backend.
+    default: 8443
+  # traefik.web.cert:
+  #   type: certificate
+  #   description: The TLS certificate to use for the 'web' backend.
+
+  traefik.file.enabled:
+    description: |
+      Whether the 'file' backend should be enabled.
+    default: false
+  traefik.file.rules:
+    description: |
+      A verbatim of rules to use for the 'file' backend.
+
+      See <https://docs.traefik.io/configuration/backends/file/> for more
+      information on the TOML syntax used here.
+    example: |
+      [backends]
+        [backends.backend1]
+          [backends.backend1.circuitbreaker]
+          expression = "NetworkErrorRatio() > 0.5"
+          [backends.backend1.servers.server1]
+          url = "http://172.17.0.2:80"
+          weight = 10
+          [backends.backend1.servers.server2]
+          url = "http://172.17.0.3:80"
+          weight = 1
+        [backends.backend2]
+          [backends.backend2.maxconn]
+          amount = 10
+          extractorfunc = "request.host"
+          [backends.backend2.LoadBalancer]
+          method = "drr"
+          [backends.backend2.servers.server1]
+          url = "http://172.17.0.4:80"
+          weight = 1
+          [backends.backend2.servers.server2]
+          url = "http://172.17.0.5:80"
+          weight = 2
+
+      [frontends]
+        [frontends.frontend1]
+        backend = "backend2"
+          [frontends.frontend1.routes.test_1]
+          rule = "Host:test.localhost"
+        [frontends.frontend2]
+        backend = "backend1"
+        passHostHeader = true
+        priority = 10
+        entrypoints = ["https"] # overrides defaultEntryPoints
+          [frontends.frontend2.routes.test_1]
+          rule = "Host:{subdomain:[a-z]+}.localhost"
+        [frontends.frontend3]
+        entrypoints = ["http", "https"] # overrides defaultEntryPoints
+        backend = "backend2"
+        rule = "Path:/test"
+  traefik.file.watch:
+    description: |
+      Whether Traefik should watch the rules file for any dynamic change.
+    default: false

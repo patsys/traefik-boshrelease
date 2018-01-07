@@ -1,0 +1,291 @@
+################################################################
+# Global configuration
+################################################################
+
+# Duration to give active requests a chance to finish before Traefik stops.
+#
+# Optional
+# Default: "10s"
+#
+# graceTimeOut = "10s"
+
+# Enable debug mode.
+#
+# Optional
+# Default: false
+#
+debug = <% p('traefik.debug') %>
+
+# Periodically check if a new version has been released.
+#
+# Optional
+# Default: true
+#
+# checkNewVersion = false
+
+# Backends throttle duration.
+#
+# Optional
+# Default: "2s"
+#
+# ProvidersThrottleDuration = "2s"
+
+# Controls the maximum idle (keep-alive) connections to keep per-host.
+#
+# Optional
+# Default: 200
+#
+# MaxIdleConnsPerHost = 200
+
+# If set to true invalid SSL certificates are accepted for backends.
+# This disables detection of man-in-the-middle attacks so should only be used on secure backend networks.
+#
+# Optional
+# Default: false
+#
+InsecureSkipVerify = <% p('traefik.accept_invalid_backend_certificates') %>
+
+# Register Certificates in the RootCA.
+#
+# Optional
+# Default: []
+#
+# RootCAs = [ "/mycert.cert" ]
+
+# Entrypoints to be used by frontends that do not specify any entrypoint.
+# Each frontend can specify its own entrypoints.
+#
+# Optional
+# Default: ["http"]
+#
+# defaultEntryPoints = ["http", "https"]
+
+
+
+################################################################
+# Traefik logs configuration
+################################################################
+
+# Log level
+#
+# Optional
+# Default: "ERROR"
+#
+# Accepted values, in order of severity: "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
+# Messages at and above the selected level will be logged.
+#
+logLevel = "<% p('traefik.log_level') %>"
+
+# Traefik logs
+# Enabled by default and log to stdout
+#
+# Optional
+#
+[traefikLog]
+
+# Sets the filepath for the traefik log. If not specified, stdout will be used.
+# Intermediate directories are created if necessary.
+#
+# Optional
+# Default: os.Stdout
+#
+filePath = "/var/vcap/data/sys/log/traefik/traefik.log"
+
+# Format is either "json" or "common".
+#
+# Optional
+# Default: "common"
+#
+# format = "common"
+
+
+
+<% if p('traefik.access_logs.enabled') %>
+################################################################
+# Access logs configuration
+################################################################
+
+# Enable access logs
+# By default it will write to stdout and produce logs in the textual
+# Common Log Format (CLF), extended with additional fields.
+#
+# Optional
+#
+[accessLog]
+
+# Sets the file path for the access log. If not specified, stdout will be used.
+# Intermediate directories are created if necessary.
+#
+# Optional
+# Default: os.Stdout
+#
+filePath = "/var/vcap/data/sys/log/traefik/access.log"
+
+# Format is either "json" or "common".
+#
+# Optional
+# Default: "common"
+#
+# format = "common"
+<% end %>
+
+
+
+################################################################
+# Entry Points configuration
+################################################################
+
+[entryPoints]
+<% if p('traefik.http.enabled') -%>
+  [entryPoints.http]
+  address = ":80"
+<% end -%>
+<% if p('traefik.tls.enabled') -%>
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+      CertFile = "/var/vcap/jobs/traefik/tls/traefik-default.crt"
+      KeyFile = "/var/vcap/jobs/traefik/tls/traefik-default.key"
+<% end -%>
+
+
+
+<% if p('traefik.acme.enabled') %>
+################################################################
+# Let's Encrypt configuration
+################################################################
+[acme]
+
+# Email address used for registration.
+#
+# Required
+#
+email = "<% p('traefik.acme.certs_email') %>"
+
+# File or key used for certificates storage.
+#
+# Required
+#
+# storage = "acme.json"
+# or `storage = "traefik/acme/account"` if using KV store.
+storage = "/var/vcap/store/traefik/acme/acme.json"
+
+# Entrypoint to proxy acme challenge/apply certificates to.
+# WARNING, must point to an entrypoint on port 443
+#
+# Required
+#
+entryPoint = "https"
+
+# Use a DNS based acme challenge rather than external HTTPS access
+#
+#
+# Optional
+#
+# dnsProvider = "digitalocean"
+
+# By default, the dnsProvider will verify the TXT DNS challenge record before letting ACME verify.
+# If delayDontCheckDNS is greater than zero, avoid this & instead just wait so many seconds.
+# Useful if internal networks block external DNS queries.
+#
+# Optional
+#
+# delayDontCheckDNS = 0
+
+# If true, display debug log messages from the acme client library.
+#
+# Optional
+#
+acmeLogging = true
+
+# Enable on demand certificate.
+#
+# Optional
+#
+onDemand = true
+
+# Enable certificate generation on frontends Host rules.
+#
+# Optional
+#
+# onHostRule = true
+
+# CA server to use.
+# - Uncomment the line to run on the staging let's encrypt server.
+# - Leave comment to go to prod.
+#
+# Optional
+#
+# caServer = "https://acme-staging.api.letsencrypt.org/directory"
+<% if p('traefik.acme.staging') %>
+caServer = "https://acme-staging.api.letsencrypt.org/directory"
+<% end %>
+
+# Domains list.
+#
+# [[acme.domains]]
+# main = "local1.com"
+# sans = ["test1.local1.com", "test2.local1.com"]
+# [[acme.domains]]
+# main = "local2.com"
+# sans = ["test1.local2.com", "test2.local2.com"]
+# [[acme.domains]]
+# main = "local3.com"
+# [[acme.domains]]
+# main = "local4.com"
+<% end %>
+
+
+
+<% if p('traefik.web.enabled') %>
+################################################################
+# Web backend configuration
+################################################################
+[web]
+
+# Web administration port.
+#
+# Required
+# Default: ":8080"
+#
+address = ":<% p('traefik.web.port') %>"
+
+# SSL certificate and key used.
+#
+# Optional
+#
+# certFile = "traefik.crt"
+# keyFile = "traefik.key"
+
+# Set REST API to read-only mode.
+#
+# Optional
+# Default: false
+#
+readOnly = <% p('traefik.web.readonly') %>
+<% end %>
+
+
+
+<% if p('traefik.file.enabled') %>
+################################################################
+# File backend configuration
+################################################################
+[file]
+
+# Rules file
+# If defined, traefik will load rules from this file,
+# otherwise, it will load rules from current file (cf Sample rules below).
+#
+# Optional
+#
+# filename = "rules.toml"
+filename = "/var/vcap/jobs/traefik/conf/rules.toml"
+
+# Enable watch file changes
+#
+# Optional
+#
+watch = <% p('traefik.file.watch') %>
+<% end %>
