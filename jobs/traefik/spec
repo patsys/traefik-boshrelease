@@ -6,6 +6,9 @@ description: This job runs a Traefik reverse-proxy.
 templates:
   bin/traefik_ctl: bin/traefik_ctl
   conf/traefik.toml: conf/traefik.toml
+  conf/rules.toml: conf/rules.toml
+  tls/traefik-default.crt: tls/traefik-default.crt
+  tls/traefik-default.key: tls/traefik-default.key
 
 packages:
   - traefik
