@@ -14,7 +14,7 @@
 # Optional
 # Default: false
 #
-debug = <% p('traefik.debug') %>
+debug = <%= p('traefik.debug') %>
 
 # Periodically check if a new version has been released.
 #
@@ -43,7 +43,7 @@ debug = <% p('traefik.debug') %>
 # Optional
 # Default: false
 #
-InsecureSkipVerify = <% p('traefik.accept_invalid_backend_certificates') %>
+InsecureSkipVerify = <%= p('traefik.accept_invalid_backend_certificates') %>
 
 # Register Certificates in the RootCA.
 #
@@ -74,7 +74,7 @@ InsecureSkipVerify = <% p('traefik.accept_invalid_backend_certificates') %>
 # Accepted values, in order of severity: "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"
 # Messages at and above the selected level will be logged.
 #
-logLevel = "<% p('traefik.log_level') %>"
+logLevel = "<%= p('traefik.log_level') %>"
 
 # Traefik logs
 # Enabled by default and log to stdout
@@ -161,7 +161,7 @@ filePath = "/var/vcap/data/sys/log/traefik/access.log"
 #
 # Required
 #
-email = "<% p('traefik.acme.certs_email') %>"
+email = "<%= p('traefik.acme.certs_email') %>"
 
 # File or key used for certificates storage.
 #
@@ -249,7 +249,7 @@ caServer = "https://acme-staging.api.letsencrypt.org/directory"
 # Required
 # Default: ":8080"
 #
-address = ":<% p('traefik.web.port') %>"
+address = ":<%= p('traefik.web.port') %>"
 
 # SSL certificate and key used.
 #
@@ -263,7 +263,7 @@ address = ":<% p('traefik.web.port') %>"
 # Optional
 # Default: false
 #
-readOnly = <% p('traefik.web.readonly') %>
+readOnly = <%= p('traefik.web.readonly') %>
 <% end %>
 
 
@@ -287,5 +287,5 @@ filename = "/var/vcap/jobs/traefik/conf/rules.toml"
 #
 # Optional
 #
-watch = <% p('traefik.file.watch') %>
+watch = <%= p('traefik.file.watch') %>
 <% end %>
