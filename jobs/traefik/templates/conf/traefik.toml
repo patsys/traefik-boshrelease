@@ -85,7 +85,7 @@ traefikLogsFile = "/var/vcap/data/sys/log/traefik/traefik.log"
 
 
 
-<% if p('traefik.access_logs.enabled') %>
+<% if p('traefik.access_logs.enabled') -%>
 ################################################################
 # Access logs configuration
 ################################################################
@@ -112,7 +112,7 @@ filePath = "/var/vcap/data/sys/log/traefik/access.log"
 # Default: "common"
 #
 # format = "common"
-<% end %>
+<% end -%>
 
 
 
@@ -136,7 +136,7 @@ filePath = "/var/vcap/data/sys/log/traefik/access.log"
 
 
 
-<% if p('traefik.acme.enabled') %>
+<% if p('traefik.acme.enabled') -%>
 ################################################################
 # Let's Encrypt configuration
 ################################################################
@@ -203,9 +203,9 @@ onDemand = true
 # Optional
 #
 # caServer = "https://acme-staging.api.letsencrypt.org/directory"
-<% if p('traefik.acme.staging') %>
+<% if p('traefik.acme.staging') -%>
 caServer = "https://acme-staging.api.letsencrypt.org/directory"
-<% end %>
+<% end -%>
 
 # Domains list.
 #
@@ -219,11 +219,11 @@ caServer = "https://acme-staging.api.letsencrypt.org/directory"
 # main = "local3.com"
 # [[acme.domains]]
 # main = "local4.com"
-<% end %>
+<% end -%>
 
 
 
-<% if p('traefik.web.enabled') %>
+<% if p('traefik.web.enabled') -%>
 ################################################################
 # Web backend configuration
 ################################################################
@@ -249,11 +249,11 @@ address = ":<%= p('traefik.web.port') %>"
 # Default: false
 #
 readOnly = <%= p('traefik.web.readonly') %>
-<% end %>
+<% end -%>
 
 
 
-<% if p('traefik.file.enabled') %>
+<% if p('traefik.file.enabled') -%>
 ################################################################
 # File backend configuration
 ################################################################
@@ -273,4 +273,4 @@ filename = "/var/vcap/jobs/traefik/conf/rules.toml"
 # Optional
 #
 watch = <%= p('traefik.file.watch') %>
-<% end %>
+<% end -%>
