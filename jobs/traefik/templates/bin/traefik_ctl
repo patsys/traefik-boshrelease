@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
+set -ex
+
+
+# Log files init
 mkdir -p /var/vcap/data/sys/log/traefik
 chown vcap:vcap /var/vcap/data/sys/log/traefik
+
+date +%F_%T >> /var/vcap/data/sys/log/traefik/traefik_ctl.stdout.log
+date +%F_%T >> /var/vcap/data/sys/log/traefik/traefik_ctl.stderr.log
+exec 1>> /var/vcap/data/sys/log/traefik/traefik_ctl.stdout.log
+exec 2>> /var/vcap/data/sys/log/traefik/traefik_ctl.stderr.log
+chown vcap:vcap /var/vcap/data/sys/log/traefik/traefik_ctl.std{out,err}.log
+
 
 # Persistent storage init
 mkdir -p /var/vcap/store/traefik/acme
