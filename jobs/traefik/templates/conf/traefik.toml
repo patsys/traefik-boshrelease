@@ -154,7 +154,11 @@ email = "<%= p('traefik.acme.certs_email') %>"
 #
 # storage = "acme.json"
 # or `storage = "traefik/acme/account"` if using KV store.
-storage = "/var/vcap/store/traefik/acme/acme.json"
+<% if p('traefik.acme.staging') -%>
+storage = "/var/vcap/store/traefik/acme/acme-staging-data.json"
+<% else -%>
+storage = "/var/vcap/store/traefik/acme/acme-data.json"
+<% end -%>
 
 # Entrypoint to proxy acme challenge/apply certificates to.
 # WARNING, must point to an entrypoint on port 443
