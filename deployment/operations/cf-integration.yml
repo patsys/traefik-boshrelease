@@ -1,0 +1,58 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/accept_invalid_backend_certificates
+  type: replace
+  value: true
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/file?
+  type: replace
+  value:
+    rules: |
+      [backends]
+        [backends.traefik-ui]
+          [backends.traefik-ui.servers.server1]
+          url = "http://localhost:8080"
+
+        [backends.cf-http-backend]
+          [backends.cf-http-backend.circuitbreaker]
+          expression = "NetworkErrorRatio() > 0.5"
+          [backends.cf-http-backend.servers.router0]
+          url = "http://10.244.0.34:80"
+
+        [backends.cf-tls-backend]
+          [backends.cf-tls-backend.circuitbreaker]
+          expression = "NetworkErrorRatio() > 0.5"
+          [backends.cf-tls-backend.servers.router0]
+          url = "https://10.244.0.34:443"
+
+      [frontends]
+        [frontends.traefik-ui]
+        entrypoints = [ "https" ]
+        priority = 20
+        backend = "traefik-ui"
+        passHostHeader = true
+          [frontends.traefik-ui.routes.route1]
+          rule = "Host: ((traefik_domain))"
+
+        [frontends.cf-http-frontend]
+        entrypoints = [ "http" ]
+        priority = 10
+        backend = "cf-http-backend"
+        passHostHeader = true
+          [frontends.cf-http-frontend.routes.catch-all]
+          # Workaround for a catch-all rule:
+          rule = "HostRegexp: {dummy:[a-z0-9.-]+}"
+
+        [frontends.cf-tls-frontend]
+        entrypoints = [ "https" ]
+        priority = 10
+        backend = "cf-tls-backend"
+        passHostHeader = true
+          [frontends.cf-tls-frontend.routes.catch-all]
+          # Workaround for a catch-all rule:
+          rule = "HostRegexp: {dummy:[a-z0-9.-]+}"
+    watch: true
+
+- path: /instance_groups/name=traefik/vm_extensions?/-
+  type: replace
+  value: traefik-lb

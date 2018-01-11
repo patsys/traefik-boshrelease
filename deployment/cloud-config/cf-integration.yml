@@ -1,0 +1,15 @@
+---
+
+- path: /vm_extensions/name=ssh-proxy-and-router-lb/cloud_properties/ports
+  type: replace
+  value:
+    - host: 2222
+
+- path: /vm_extensions/-
+  type: replace
+  value:
+    name: traefik-lb
+    cloud_properties:
+      ports:
+        - host: 80
+        - host: 443

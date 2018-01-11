@@ -1,0 +1,63 @@
+---
+name: traefik
+
+instance_groups:
+  - name: traefik
+    instances: 1
+    azs: [ z1 ]
+    jobs:
+      - name: traefik
+        release: traefik
+        properties:
+          traefik:
+            log_level: INFO
+            access_logs: { enabled: true }
+            http: { enabled: true }
+            tls:
+              cert: ((traefik_tls))
+            acme:
+              enabled: true
+              certs_email: your-acme-certs-contact@example.com
+              staging: true # Move to 'false' when everything is OK
+            web:
+              enabled: true
+    stemcell: default
+    vm_type: default
+    persistent_disk_type: 1GB
+    env:
+      bosh: { swap_size: 0 }
+    networks:
+      - name: default
+
+variables:
+  - name: traefikCA
+    type: certificate
+    options:
+      is_ca: true
+      common_name: traefikCA
+
+  - name: traefik_tls
+    type: certificate
+    options:
+      ca: traefikCA
+      common_name: ((traefik_domain))
+      alternative_names:
+        - "*.((traefik_domain))"
+
+update:
+  serial: true # instance groups to be deployed sequentially.
+
+  canaries: 1
+  canary_watch_time: 1000-5000
+
+  max_in_flight: 1
+  update_watch_time: 1000-5000
+
+releases:
+  - name: traefik
+    version: latest
+
+stemcells:
+  - alias: default
+    os: ubuntu-trusty
+    version: latest
