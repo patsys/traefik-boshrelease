@@ -11,5 +11,5 @@ So the main use-case for this BOSH Release is to deploy Træfik in front of
 your Cloud Foundry routers. This enable all your Cloud Foundry applications to
 benefit from valid HTTPS certificates with absolutely no fuss. They are
 provisioned on the fly, when the first web request is made. See the main
-deployment manifest and related operations files for Cloud Foundry
-integration.
+[deployment manifest](./deployment) and related operations files for Cloud
+Foundry integration.
