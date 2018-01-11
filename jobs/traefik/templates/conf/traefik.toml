@@ -83,6 +83,12 @@ logLevel = "<%= p('traefik.log_level') %>"
 #
 traefikLogsFile = "/var/vcap/data/sys/log/traefik/traefik.log"
 
+# NOTE: after version 1.4.6, the new [traefikLog] section is introduced.
+# See:
+#   <https://github.com/containous/traefik/blob/837db9a/traefik.sample.toml#L35-L55>
+# Compared to:
+#   <https://github.com/containous/traefik/blob/v1.4.6/traefik.sample.toml#L12-L24>
+
 
 
 <% if p('traefik.access_logs.enabled') -%>
