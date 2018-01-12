@@ -21,7 +21,8 @@ types for all new accounts. This temporarily compromises the Automated
 Certificate Management (ACME) implementation of Træfik. As a
 workaround, the DNS validation method can be used instead.
 
-See [original blog post](1) and [update post](2) for more details.
+See the [original blog post](1) and the [update post](2) for more
+details.
 
 [1]: https://community.letsencrypt.org/t/2018-01-11-update-regarding-acme-tls-sni-and-shared-hosting-infrastructure/50188
 [2]: https://community.letsencrypt.org/t/2018-01-09-issue-with-tls-sni-01-and-shared-hosting-infrastructure/49996
