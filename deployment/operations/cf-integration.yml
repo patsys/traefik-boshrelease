@@ -12,18 +12,14 @@
       [backends]
         [backends.traefik-ui]
           [backends.traefik-ui.servers.server1]
-          url = "http://localhost:8080"
+          url = "http://127.0.0.1:8080"
 
         [backends.cf-http-backend]
-          [backends.cf-http-backend.circuitbreaker]
-          expression = "NetworkErrorRatio() > 0.5"
-          [backends.cf-http-backend.servers.router0]
+          [backends.cf-http-backend.servers.router0-http]
           url = "http://10.244.0.34:80"
 
         [backends.cf-tls-backend]
-          [backends.cf-tls-backend.circuitbreaker]
-          expression = "NetworkErrorRatio() > 0.5"
-          [backends.cf-tls-backend.servers.router0]
+          [backends.cf-tls-backend.servers.router0-tls]
           url = "https://10.244.0.34:443"
 
       [frontends]
@@ -33,14 +29,14 @@
         backend = "traefik-ui"
         passHostHeader = true
           [frontends.traefik-ui.routes.route1]
-          rule = "Host: ((traefik_domain))"
+          rule = "Host: ((web_backend_hostname))"
 
         [frontends.cf-http-frontend]
         entrypoints = [ "http" ]
         priority = 10
         backend = "cf-http-backend"
         passHostHeader = true
-          [frontends.cf-http-frontend.routes.catch-all]
+          [frontends.cf-http-frontend.routes.catch-all-http]
           # Workaround for a catch-all rule:
           rule = "HostRegexp: {dummy:[a-z0-9.-]+}"
 
@@ -49,7 +45,7 @@
         priority = 10
         backend = "cf-tls-backend"
         passHostHeader = true
-          [frontends.cf-tls-frontend.routes.catch-all]
+          [frontends.cf-tls-frontend.routes.catch-all-tls]
           # Workaround for a catch-all rule:
           rule = "HostRegexp: {dummy:[a-z0-9.-]+}"
     watch: true
