@@ -17,9 +17,9 @@ Foundry integration.
 **Update:**
 
 Since 2018-01-09, Let's Encrypt has shut down the TLS-SNI validation
-types for all new accounts. This temporarily compromises the
-(Automated Certificate Management (ACME) implementation of Træfik. The
-DNS validation method can be used instead.
+types for all new accounts. This temporarily compromises the Automated
+Certificate Management (ACME) implementation of Træfik. As a
+workaround, the DNS validation method can be used instead.
 
 See [original blog post](1) and [update post](2) for more details.
 
