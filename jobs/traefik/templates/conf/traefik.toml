@@ -134,10 +134,12 @@ filePath = "/var/vcap/data/sys/log/traefik/access.log"
 <% if p('traefik.tls.enabled') -%>
   [entryPoints.https]
   address = ":443"
+<% if_p('traefik.tls.cert') do |cert| -%>
     [entryPoints.https.tls]
       [[entryPoints.https.tls.certificates]]
       CertFile = "/var/vcap/jobs/traefik/tls/traefik-default.crt"
       KeyFile = "/var/vcap/jobs/traefik/tls/traefik-default.key"
+<% end -%>
 <% end -%>
 
 
