@@ -15,12 +15,6 @@ instance_groups:
             http: { enabled: true }
             tls:
               cert: ((traefik_tls))
-            acme:
-              enabled: true
-              certs_email: your-acme-certs-contact@example.com
-              staging: true # Move to 'false' when everything is OK
-            web:
-              enabled: true
     stemcell: default
     vm_type: default
     persistent_disk_type: 1GB

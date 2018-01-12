@@ -1,0 +1,8 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/acme
+  type: replace
+  value:
+    enabled: true
+    certs_email: ((acme_certs_email))
+    staging: ((acme_staging)) # Move from 'true' to 'false' when everything is OK

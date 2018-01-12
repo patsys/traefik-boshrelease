@@ -1,0 +1,9 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/web
+  type: replace
+  value:
+    enabled: true
+    basic_auth:
+      username: ((web_backend_username))
+      md5_htpasswd: ((web_backend_md5_htpasswd))
