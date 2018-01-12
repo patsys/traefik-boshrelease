@@ -102,6 +102,15 @@ properties:
       care not exposing this endpoint to the entire Internet, otherwise your
       server could get compromized by malicious users.
     default: false
+  traefik.web.basic_auth.username:
+    description: |
+      Basic Auth username to access the 'web' backend.
+  traefik.web.basic_auth.md5_htpasswd:
+    description: |
+      Basic Auth digested passwd (like 'htpasswd' does) to access the
+      'web' backend.
+    # TODO: use <https://github.com/copiousfreetime/htauth> to inject
+    # BOSH-generated certificates in the traefik.toml ERB template.
   traefik.web.readonly:
     description: |
       Whether the 'web' endpoint should be readonly, in which case the Traefik

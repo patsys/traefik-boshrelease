@@ -261,6 +261,9 @@ address = ":<%= p('traefik.web.port') %>"
 # Default: false
 #
 readOnly = <%= p('traefik.web.readonly') %>
+
+[web.auth.basic]
+users = [ "<%= p('traefik.web.basic_auth.username') %>:<%= p('traefik.web.basic_auth.md5_htpasswd') %>" ]
 <% end -%>
 
 
