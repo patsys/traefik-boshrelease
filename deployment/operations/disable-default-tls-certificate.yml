@@ -2,3 +2,9 @@
 
 - path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/tls/cert
   type: remove
+
+- path: /variables/name=traefikCA
+  type: remove
+
+- path: /variables/name=traefik_tls
+  type: remove
