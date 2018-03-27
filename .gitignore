@@ -1,5 +1,6 @@
 /blobs/
 /.dev_builds/
 /dev_releases/
+/tmp/
 /*.gz
 /config/private.yml

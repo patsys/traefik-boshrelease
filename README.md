@@ -1,7 +1,7 @@
 Træfik BOSH Release
-====================
+===================
 
-This [Bosh](https://bosh.io) release deploys a [Træfik](https://traefik.io/)
+This [BOSH](https://bosh.io) release deploys a [Træfik](https://traefik.io/)
 reverse-proxy.
 
 Træefik is a modern and dynamic reverse-proxy, that is well known for
@@ -14,7 +14,51 @@ provisioned on the fly, when the first web request is made. See the main
 [deployment manifest](./deployment) and related operations files for Cloud
 Foundry integration.
 
-**Update:**
+
+What is BOSH?
+-------------
+
+For those who don't know,
+[BOSH is Borg++](https://twitter.com/marklucovsky/status/728950262593953792),
+where [Google Borg](https://research.google.com/pubs/pub43438.html) is a
+large-scale cluster management tool. Borg is a proprietary tool by Google,
+whereas [BOSH is Open Source](https://github.com/cloudfoundry/bosh).
+
+For an introduction about what is BOSH, go watch
+[this talk given by Benjamin Gandon from Gstack](https://slides.gstack.io/bosh-deploy-distributed-systems-like-a-boss-may-2017/)
+and then go read the [Ultimate Guide to BOSH](http://ultimateguidetobosh.com/)
+in order to lean more.
+
+
+Usage
+-----
+
+Here is a very basic way of using this BOSH Release. You'll need to properly
+target a previously-installed BOSH Director.
+
+```bash
+export BOSH_ENVIRONMENT=<alias>
+export BOSH_DEPLOYMENT=traefik
+
+git clone https://github.com/gstackio/traefik-boshrelease.git
+cd traefik-boshrelease
+
+mkdir tmp
+> tmp/depl-creds.yml
+chmod 600 tmp/depl-creds.yml
+
+bosh deploy deployment/traefik-deployment.yml --vars-store tmp/depl-creds.yml
+```
+
+For more details and possible variants, go read the documentation in the
+[deployment](./deployment) sub-directory.
+
+An example for a Træfik deployment that is integrated to Cloud Foundry is
+available in the [Easy Foundry distribution](https://github.com/gstackio/gstack-bosh-environment).
+
+
+Caveats
+-------
 
 Since 2018-01-09, Let's Encrypt has shut down the TLS-SNI validation
 types for all new accounts. This temporarily compromises the Automated
@@ -27,6 +71,9 @@ details.
 [1]: https://community.letsencrypt.org/t/2018-01-11-update-regarding-acme-tls-sni-and-shared-hosting-infrastructure/50188
 [2]: https://community.letsencrypt.org/t/2018-01-09-issue-with-tls-sni-01-and-shared-hosting-infrastructure/49996
 
+This has been fixed in Træfik 1.5.0 (codename
+[Cancoillotte](https://blog.containo.us/traefik-1-5-cancoillotte-is-here-7bd6713ae135))
+and later, which will be shipped in a later version of this BOSH Release.
 
 
 Contributing
