@@ -45,5 +45,5 @@ certificates.
 ### `operations/enable-web-backend.yml`
 
 This operation file enable the `web` backend for viewing the Træfik config
-through a read-only web UI. This managemtn UI is protected by a Basic Auth
+through a read-only web UI. This managment UI is protected by a Basic Auth
 username and password.
