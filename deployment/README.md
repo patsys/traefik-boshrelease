@@ -44,6 +44,29 @@ certificates.
 
 ### `operations/enable-web-backend.yml`
 
-This operation file enable the `web` backend for viewing the Træfik config
-through a read-only web UI. This managment UI is protected by a Basic Auth
-username and password.
+This operation file enables the `web` backend for viewing the Træfik config
+through a read-only web UI. This managment UI runs on port `8080` and is
+protected by a Basic Auth username and password.
+
+
+### `operations/enable-web-backend-tls.yml`
+
+Together with `enable-web-backend.yml`, this enables TLS on the `web` backend,
+and have it served on port `8443`.
+
+
+### `operations/enable-web-backend-readwrite.yml`
+
+This operation file enables the `web` backend for modifying the Træfik config
+through a read-only web UI and a read-write API. Enabling this is discouraged
+in production, unless proper access restrictions are applied on the `web`
+backend, and TLS is enabled.
+
+
+### `operations/latest-release.yml`
+
+By default, the default deployment manifest pins this release version to the
+latest final version available. When iterating on newer versions of this BOSH
+release, you'll be interested in using the `latest` release that has been
+uploaded to the BOSH Director. This is exactly what's provided by this
+operations file.
