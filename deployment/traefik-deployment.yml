@@ -49,7 +49,9 @@ update:
 
 releases:
   - name: traefik
-    version: latest
+    version: 1.0.0
+    url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.0.0/traefik-1.0.0.tgz
+    sha1: 204bb2fe003b548cdc34a331db4e88f7363de52a
 
 stemcells:
   - alias: default

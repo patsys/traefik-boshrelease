@@ -1,0 +1,7 @@
+---
+
+- path: /releases/name=traefik
+  type: replace
+  value:
+    name: traefik
+    version: latest
