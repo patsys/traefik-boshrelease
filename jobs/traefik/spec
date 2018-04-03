@@ -105,12 +105,13 @@ properties:
   traefik.web.basic_auth.username:
     description: |
       Basic Auth username to access the 'web' backend.
-  traefik.web.basic_auth.md5_htpasswd:
+  traefik.web.basic_auth.password:
     description: |
-      Basic Auth digested passwd (like 'htpasswd' does) to access the
-      'web' backend.
-    # TODO: use <https://github.com/copiousfreetime/htauth> to inject
-    # BOSH-generated certificates in the traefik.toml ERB template.
+      Basic Auth password to access the 'web' backend.
+
+      This value will end up being (kind of) MD5-digested (like 'htpasswd'
+      does) before it is injected in Traefik config, so it will not appear in
+      clear-text on the BOSH-managed Traefik nodes.
   traefik.web.readonly:
     description: |
       Whether the 'web' endpoint should be readonly, in which case the Traefik

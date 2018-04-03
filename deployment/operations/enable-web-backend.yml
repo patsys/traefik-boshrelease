@@ -6,4 +6,10 @@
     enabled: true
     basic_auth:
       username: ((web_backend_username))
-      md5_htpasswd: ((web_backend_md5_htpasswd))
+      password: ((web_backend_password))
+
+- path: /variables?/name=web_backend_password
+  type: replace
+  value:
+    name: web_backend_password
+    type: password
