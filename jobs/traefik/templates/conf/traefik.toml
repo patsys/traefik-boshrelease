@@ -367,8 +367,10 @@ address = ":<%= p('traefik.web.port') %>"
 #
 # Optional
 #
-# certFile = "traefik.crt"
-# keyFile = "traefik.key"
+<% if p('traefik.web.tls.enabled') -%>
+certFile = "/var/vcap/jobs/traefik/tls/web-backend.crt"
+keyFile = "/var/vcap/jobs/traefik/tls/web-backend.key"
+<% end -%>
 
 # Set REST API to read-only mode.
 #

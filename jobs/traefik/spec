@@ -9,6 +9,8 @@ templates:
   conf/rules.toml: conf/rules.toml
   tls/traefik-default.crt: tls/traefik-default.crt
   tls/traefik-default.key: tls/traefik-default.key
+  tls/web-backend.crt: tls/web-backend.crt
+  tls/web-backend.key: tls/web-backend.key
 
 packages:
   - traefik
@@ -118,15 +120,20 @@ properties:
       configuration can only be read and not modified through this backend.
     default: true
   traefik.web.port:
-    description: TCP port for the 'web' backend.
+    description: |
+      TCP port for the 'web' backend.
+
+      We advise to set '8443' here when 'traefik.web.tls.enabled' is set to
+      'true'.
     default: 8080
-  # traefik.web.tls.enabled:
-  #   description: |
-  #     Whether to activate TLS for the 'web' backend.
-  #   default: false
-  # traefik.web.tls.cert:
-  #   type: certificate
-  #   description: The TLS certificate to use for the 'web' backend.
+  traefik.web.tls.enabled:
+    description: |
+      Whether to activate TLS for the 'web' backend.
+    default: false
+  traefik.web.tls.cert:
+    type: certificate
+    description: |
+      The TLS certificate to use for the 'web' backend.
 
   traefik.file.enabled:
     description: |

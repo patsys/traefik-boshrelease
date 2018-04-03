@@ -1,0 +1,29 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/web/port
+  type: replace
+  value: 8443
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/web/tls
+  type: replace
+  value:
+    enabled: true
+    cert: ((web_backend_tls))
+
+- path: /variables?/name=traefikCA
+  type: replace
+  value:
+    name: traefikCA
+    type: certificate
+    options:
+      is_ca: true
+      common_name: traefikCA
+
+- path: /variables?/name=web_backend_tls
+  type: replace
+  value:
+    name: web_backend_tls
+    type: certificate
+    options:
+      ca: traefikCA
+      common_name: web_backend_tls
