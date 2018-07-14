@@ -8,7 +8,7 @@
 - path: /vm_extensions/-
   type: replace
   value:
-    name: traefik-lb
+    name: traefik-loadbalancer
     cloud_properties:
       ports:
         - host: 80
