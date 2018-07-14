@@ -17,7 +17,7 @@ instance_groups:
               cert: ((traefik_tls))
     stemcell: default
     vm_type: default
-    persistent_disk_type: 1GB
+    persistent_disk_type: default
     env:
       bosh: { swap_size: 0 }
     networks:
