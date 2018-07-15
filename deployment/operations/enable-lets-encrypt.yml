@@ -6,3 +6,8 @@
     enabled: true
     certs_email: ((acme_certs_email))
     staging: ((acme_staging)) # Move from 'true' to 'false' when everything is OK
+
+# the HTTP-01 challenge requires the HTTP backend to be enabled
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties?/traefik/http/enabled
+  type: replace
+  value: true

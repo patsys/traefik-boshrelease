@@ -346,6 +346,18 @@ caServer = "https://acme-staging.api.letsencrypt.org/directory"
 # main = "local3.com"
 # [[acme.domains]]
 # main = "local4.com"
+
+# Use a HTTP-01 ACME challenge.
+#
+# Optional (but recommended)
+#
+[acme.httpChallenge]
+
+  # EntryPoint to use for the HTTP-01 challenges.
+  #
+  # Required
+  #
+  entryPoint = "http"
 <% end -%>
 
 
