@@ -1,0 +1,19 @@
+name: traefik
+version: 1.2.0
+commit_hash: cad94b3
+uncommitted_changes: false
+jobs:
+- name: traefik
+  version: 55add02b91b6202de3c3ddaf546d283794b8f1b9
+  fingerprint: 55add02b91b6202de3c3ddaf546d283794b8f1b9
+  sha1: a8936f882104934e21dd0c572ce9a2a8adffdecf
+packages:
+- name: traefik
+  version: b93115a469c2118fb22b3d62fabd3b5014e64abc
+  fingerprint: b93115a469c2118fb22b3d62fabd3b5014e64abc
+  sha1: 2794295900773b6a1e3b0a3cc8f4c88c2d3be1e8
+  dependencies: []
+license:
+  version: fa345d4b0b940116afc8e1f4213ba5b84536c468
+  fingerprint: fa345d4b0b940116afc8e1f4213ba5b84536c468
+  sha1: 6b2dbd976a43d5dc8f88641a49fd7ccfd66e25aa
