@@ -57,25 +57,6 @@ An example for a Træfik deployment that is integrated to Cloud Foundry is
 available in the [Easy Foundry distribution](https://github.com/gstackio/gstack-bosh-environment).
 
 
-Caveats
--------
-
-Since 2018-01-09, Let's Encrypt has shut down the TLS-SNI validation
-types for all new accounts. This temporarily compromises the Automated
-Certificate Management (ACME) implementation of Træfik. As a
-workaround, the DNS validation method can be used instead.
-
-See the [original blog post](1) and the [update post](2) for more
-details.
-
-[1]: https://community.letsencrypt.org/t/2018-01-11-update-regarding-acme-tls-sni-and-shared-hosting-infrastructure/50188
-[2]: https://community.letsencrypt.org/t/2018-01-09-issue-with-tls-sni-01-and-shared-hosting-infrastructure/49996
-
-This has been fixed in Træfik 1.5.0 (codename
-[Cancoillotte](https://blog.containo.us/traefik-1-5-cancoillotte-is-here-7bd6713ae135))
-and later, which will be shipped in a later version of this BOSH Release.
-
-
 Contributing
 ------------
 

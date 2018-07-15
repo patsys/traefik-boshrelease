@@ -30,16 +30,18 @@ Træfik as the main reverse-proxy in front of Cloud Foundry routers in
 [BOSH-Lite](https://bosh.io/docs/bosh-lite.html).
 
 
+### `operations/enable-lets-encrypt.yml`
+
+This operation file enables the automatic provisioning of Let's Encrypt TLS
+certificates. The HTTP-01 challenge is used.
+
+
 ### `operations/disable-default-tls-certificate.yml`
 
 When the default kind-of-self-signed TLS certificate doesn't suit your needs,
 then use this operation file to remove it.
 
-
-### `operations/enable-lets-encrypt.yml`
-
-This operation file enables the automatic provisioning of Let's Encrypt TLS
-certificates.
+This should not be enable when using the `enable-lets-encrypt.yml` ops file.
 
 
 ### `operations/enable-web-backend.yml`
@@ -54,6 +56,10 @@ protected by a Basic Auth username and password.
 Together with `enable-web-backend.yml`, this enables TLS on the `web` backend,
 and have it served on port `8443`.
 
+This is not compatible with the default `cf-integration.yml` ops file that
+assumes the `web` backend is accessible on th `8080` port in order to expose
+it on the main TLS entrypoint for a certain host.
+
 
 ### `operations/enable-web-backend-readwrite.yml`
 
@@ -61,6 +67,21 @@ This operation file enables the `web` backend for modifying the Træfik config
 through a read-only web UI and a read-write API. Enabling this is discouraged
 in production, unless proper access restrictions are applied on the `web`
 backend, and TLS is enabled.
+
+
+### `operations/static-ip.yml`
+
+Set a static IP to the Træfik reverse-proxy.
+
+
+### `operations/rename-deployment.yml`
+
+Allows to customize the deployment name.
+
+
+### `operations/rename-network.yml`
+
+Allows to customize the network name.
 
 
 ### `operations/latest-release.yml`
