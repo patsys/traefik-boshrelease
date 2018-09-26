@@ -24,30 +24,36 @@
 
       [frontends]
         [frontends.traefik-ui]
-        entrypoints = [ "https" ]
-        priority = 20
-        backend = "traefik-ui"
-        passHostHeader = true
-          [frontends.traefik-ui.routes.route1]
-          rule = "Host: ((web_backend_hostname))"
+          entrypoints = [ "https" ]
+          priority = 20
+          backend = "traefik-ui"
+          passHostHeader = true
+
+          [frontends.traefik-ui.routes]
+            [frontends.traefik-ui.routes.route1]
+              rule = "Host: ((web_backend_hostname))"
 
         [frontends.cf-http-frontend]
-        entrypoints = [ "http" ]
-        priority = 10
-        backend = "cf-http-backend"
-        passHostHeader = true
-          [frontends.cf-http-frontend.routes.catch-all-http]
-          # Workaround for a catch-all rule:
-          rule = "HostRegexp: {dummy:[a-z0-9.-]+}"
+          entrypoints = [ "http" ]
+          priority = 10
+          backend = "cf-http-backend"
+          passHostHeader = true
+
+          [frontends.cf-http-frontend.routes]
+            [frontends.cf-http-frontend.routes.catch-all-http]
+              # Workaround for a catch-all rule:
+              rule = "HostRegexp: {dummy:[-.[:alnum:]_]+}"
 
         [frontends.cf-tls-frontend]
-        entrypoints = [ "https" ]
-        priority = 10
-        backend = "cf-tls-backend"
-        passHostHeader = true
-          [frontends.cf-tls-frontend.routes.catch-all-tls]
-          # Workaround for a catch-all rule:
-          rule = "HostRegexp: {dummy:[a-z0-9.-]+}"
+          entrypoints = [ "https" ]
+          priority = 10
+          backend = "cf-tls-backend"
+          passHostHeader = true
+
+          [frontends.cf-tls-frontend.routes]
+            [frontends.cf-tls-frontend.routes.catch-all-tls]
+              # Workaround for a catch-all rule:
+              rule = "HostRegexp: {dummy:[-.[:alnum:]_]+}"
     watch: true
 
 - path: /instance_groups/name=traefik/vm_extensions?/-
