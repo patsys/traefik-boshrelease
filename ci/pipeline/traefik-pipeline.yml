@@ -1,0 +1,283 @@
+---
+
+resource_types:
+  - name: keyval
+    type: docker-image
+    source:
+      repository: swce/keyval-resource
+ 
+resources:
+  - name: kinja-image
+    type: docker-image
+    source:
+      repository: kinja/pipeline-image
+
+  - name: traefik-gh-release
+    type: github-release
+    source:
+      owner: containous
+      repository: traefik
+      access_token: ((github_access_token))
+
+  - name: traefik-boshrelease-master
+    type: git
+    source:
+      uri: ((traefik_release_git_uri))
+      branch: master
+      private_key: ((github_private_key))
+
+  # - name: traefik-boshrelease-develop
+  #   type: git
+  #   source:
+  #     uri: ((traefik_release_git_uri))
+  #     branch: develop
+  #     private_key: ((github_private_key))
+
+  - name: bump-info
+    type: keyval
+
+jobs:
+  - name: detect
+    plan:
+      - aggregate:
+        - get: traefik-gh-release
+          trigger: true
+          params: { globs: [ "*_linux-amd64" ] }
+        - get: traefik-boshrelease-master
+        - get: kinja-image
+
+      - task: add-blob
+        # file: traefik-boshrelease/ci/tasks/add-blob/task.yml
+        input_mapping:
+          traefik-boshrelease: traefik-boshrelease-master
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: traefik-gh-release
+            - name: traefik-boshrelease
+          outputs:
+            - name: traefik-boshrelease-bumped
+            - name: bump-info
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                find traefik-gh-release -ls
+
+                echo tag:        $(< traefik-gh-release/tag)
+                echo version:    $(< traefik-gh-release/version)
+                echo commit_sha: $(< traefik-gh-release/commit_sha)
+
+                latest_traefik_version=$(< traefik-gh-release/version)
+                gzip -c9 "traefik-gh-release/traefik_linux-amd64" > "traefik-${latest_traefik_version}_linux-amd64.gz"
+
+                git clone "traefik-boshrelease" "traefik-boshrelease-bumped"
+                branch_name="bump-traefik-${latest_traefik_version}"
+
+                pushd "traefik-boshrelease-bumped" > /dev/null
+                    git checkout "master"
+                    git pull
+
+                    git checkout -b "${branch_name}"
+                    # if ! git branch "develop"; then
+                    #     git checkout "develop"
+                    #     git pull
+                    # fi
+
+                    bosh blobs
+
+                    traefik_old_blob_path=$(bosh blobs | awk '/traefik\/traefik-[0-9.]+_linux-amd64\.gz/{print $1}')
+
+                    bosh remove-blob "${traefik_old_blob_path}"
+                    bosh add-blob "../traefik-${latest_traefik_version}_linux-amd64.gz" "traefik/traefik-${latest_traefik_version}_linux-amd64.gz"
+
+                    bosh blobs
+
+                    git config --global "color.ui" "always"
+                    git status
+                    git diff | cat
+
+                    git config --global "user.name" "((git_user_name))"
+                    git config --global "user.email" "((git_user_email))"
+
+                    git add .
+                    git commit -m "Bump Traefik binary to version ${latest_traefik_version}"
+                popd > /dev/null
+
+
+                # Write properties to the keyval output resource
+
+                mkdir -p bump-info
+                echo "latest_traefik_version=${latest_traefik_version}" >> bump-info/keyval.properties
+                echo "branch_name=${branch_name}"                       >> bump-info/keyval.properties
+
+      - put: bump-info
+        params:
+          file: bump-info/keyval.properties
+
+      - task: deploy
+        image: kinja-image
+        config:
+          platform: linux
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                exit 0 # TODO: implement deploy
+
+      - task: test
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: traefik-boshrelease-bumped
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                exit 0 # TODO: implement tests
+
+      - task: upload-blobs
+        params:
+          S3_ACCESS_KEY_ID: ((s3_access_key_id))
+          S3_SECRET_ACCESS_KEY: ((s3_secret_access_key))
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: traefik-boshrelease-bumped
+          outputs:
+            - name: traefik-boshrelease-blobs-uploaded
+          params:
+            S3_ACCESS_KEY_ID:
+            S3_SECRET_ACCESS_KEY:
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                git clone "traefik-boshrelease-bumped" "traefik-boshrelease-blobs-uploaded"
+                cp -Rp "traefik-boshrelease-bumped/blobs" "traefik-boshrelease-blobs-uploaded"
+
+                set +x
+                cat <<EOF > "traefik-boshrelease-blobs-uploaded/config/private.yml"
+                ---
+                blobstore:
+                  options:
+                    access_key_id: ${S3_ACCESS_KEY_ID}
+                    secret_access_key: ${S3_SECRET_ACCESS_KEY}
+                EOF
+                set -x
+
+                pushd "traefik-boshrelease-blobs-uploaded" > /dev/null
+                    bosh upload-blobs
+
+                    git config --global "user.name" "((git_user_name))"
+                    git config --global "user.email" "((git_user_email))"
+
+                    git add "config/blobs.yml"
+                    git commit -m "Uploaded blob for new Traefik binary"
+                popd > /dev/null
+
+      - task: git-push
+        input_mapping:
+          repo: traefik-boshrelease-blobs-uploaded
+        params:
+          GIT_URI: ((traefik_release_git_uri))
+          GITHUB_PRIVATE_KEY: ((github_private_key))
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: bump-info
+            - name: repo
+          params:
+            GIT_URI:
+            GITHUB_PRIVATE_KEY:
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                mkdir -p "${HOME}/.ssh"
+                chmod 700 "${HOME}/.ssh"
+
+                touch "${HOME}/.ssh/id_rsa"
+                chmod 600 "${HOME}/.ssh/id_rsa"
+                cat <<< "${GITHUB_PRIVATE_KEY}" > "${HOME}/.ssh/id_rsa"
+
+                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
+                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
+                    > keyval.inc.bash
+                source "keyval.inc.bash"
+
+                pushd "repo" > /dev/null
+                    git remote set-url origin "${GIT_URI}"
+                    ssh-keyscan -t rsa "github.com" 2> /dev/null >> "${HOME}/.ssh/known_hosts"
+                    git push --set-upstream origin "${branch_name}"
+                popd > /dev/null
+
+      # - put: traefik-boshrelease
+      #   params:
+      #     repository: traefik-boshrelease-blobs-uploaded
+      #     rebase: true
+
+      - task: submit-pr
+        params:
+          GH_ACCESS_TOKEN: ((github_access_token))
+          GH_OWNER: gstackio
+          GH_REPO: traefik-boshrelease
+        image: kinja-image
+        config:
+          platform: linux
+          inputs:
+            - name: bump-info
+          params:
+            GH_ACCESS_TOKEN:
+            GH_OWNER:
+            GH_REPO:
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                grep -vE "^(UPDATED|UUID)=" "bump-info/keyval.properties" \
+                    | sed -r -e 's/"/\"/g; s/=(.*)$/="\1"/' \
+                    > keyval.inc.bash
+                source "keyval.inc.bash"
+
+                pr_desc="Hi there!"
+                pr_desc+="\\n"
+                pr_desc+="\\nI noticed that the new Traefik v${latest_traefik_version} is out,"
+                pr_desc+=" so I suggest we update this BOSH Release with the latest binary available."
+                pr_desc+="\\n"
+                pr_desc+="\\nHere in this PR, I've pulled that new binary in, and the tests are passing properly."
+                pr_desc+=" So I uploaded the blob to the release blobstore, and here is the result."
+                pr_desc+="\\n"
+                pr_desc+="\\nLet's give it a shot, shall we?"
+                pr_desc+="\\n"
+                pr_desc+="\\nBest"
+
+                pr_data=$(jq -n \
+                    --arg title "Bump Traefik to version ${latest_traefik_version}" \
+                    --arg body "$(echo -e "${pr_desc}")" \
+                    --arg head "${branch_name}" \
+                    '{
+                        "base": "master",
+                        "title": $title,
+                        "body": $body,
+                        "head": $head,
+                        "maintainer_can_modify": true
+                    }')
+
+                echo "Creating pull request: POST /repos/${GH_OWNER}/${GH_REPO}/pulls"
+                curl --silent --fail \
+                    --header "Accept: application/vnd.github.v3+json" \
+                    --header "Authorization: token ${GH_ACCESS_TOKEN}" \
+                    --url "https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/pulls" \
+                    --data-raw "${pr_data}"
+                exit 0
