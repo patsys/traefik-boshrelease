@@ -1,0 +1,36 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/api
+  type: replace
+  value:
+    enabled: true
+    digest_auth:
+      username: ((api_username))
+      password: ((api_password))
+    tls:
+      port: 8443
+      cert: ((api_tls))
+
+- path: /variables?/name=api_password
+  type: replace
+  value:
+    name: api_password
+    type: password
+
+- path: /variables?/name=traefikCA
+  type: replace
+  value:
+    name: traefikCA
+    type: certificate
+    options:
+      is_ca: true
+      common_name: traefikCA
+
+- path: /variables?/name=api_tls
+  type: replace
+  value:
+    name: api_tls
+    type: certificate
+    options:
+      ca: traefikCA
+      common_name: api_tls
