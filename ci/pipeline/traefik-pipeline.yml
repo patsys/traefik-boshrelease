@@ -262,6 +262,7 @@ jobs:
                 pr_desc+="\\n"
                 pr_desc+="\\nBest"
 
+                # See also: https://developer.github.com/v3/pulls/#create-a-pull-request
                 pr_data=$(jq -n \
                     --arg title "Bump Traefik to version ${latest_traefik_version}" \
                     --arg body "$(echo -e "${pr_desc}")" \
@@ -275,6 +276,7 @@ jobs:
                     }')
 
                 echo "Creating pull request: POST /repos/${GH_OWNER}/${GH_REPO}/pulls"
+                # See also: https://developer.github.com/v3/
                 curl --silent --fail \
                     --header "Accept: application/vnd.github.v3+json" \
                     --header "Authorization: token ${GH_ACCESS_TOKEN}" \
