@@ -11,6 +11,8 @@ templates:
   tls/traefik-default.key: tls/traefik-default.key
   tls/web-backend.crt: tls/web-backend.crt
   tls/web-backend.key: tls/web-backend.key
+  tls/api-entrypoint.crt: tls/api-entrypoint.crt
+  tls/api-entrypoint.key: tls/api-entrypoint.key
 
 packages:
   - traefik
@@ -19,6 +21,15 @@ properties:
   traefik.debug:
     description: |
       Whether to enable debug mode.
+
+      This mode should never be enabled in production because it exposes
+      internal state of the Traefik server that malicious users should not have
+      access to.
+
+      This will install HTTP handlers to expose Go expvars under /debug/vars
+      and pprof profiling data under /debug/pprof.
+
+      The log level will be set to DEBUG unless 'log_level' is specified.
     default: false
   traefik.log_level:
     description: |
@@ -35,7 +46,7 @@ properties:
   traefik.access_logs.enabled:
     description: |
       Whether to activate the access logs. This will produce one line for each
-      access to the traefik server. This might generate high volume of data
+      access to the Traefik server. This might generate high volume of data
       under high loads.
     default: true
 
@@ -47,14 +58,21 @@ properties:
       on trusted backend networks only.
     default: false
 
+
   traefik.http.enabled:
     description: |
       Whether to activate the HTTP entrypoint.
-    default: false
+    default: true
   traefik.http.port:
     description: |
       TCP port for the HTTP entrypoint.
     default: 80
+  traefik.http.redirect_to_https:
+    description: |
+      Whether the HTTP entrypoint redirects all web requests to the HTTPS
+      entrypoint or not.
+    default: true
+
 
   traefik.tls.enabled:
     description: |
@@ -68,12 +86,16 @@ properties:
     type: certificate
     description: |
       The default TLS certificate to present on HTTPS entrypoint.
+  traefik.tls.min_version:
+    description: |
+      The minimum TLS version to be used by the HTTPS entrypoint.
+    default: VersionTLS12
+
 
   traefik.acme.enabled:
     description: |
       Whether to activate automatic Let's Encrypt certificates.
     default: false
-
   traefik.acme.certs_email:
     description: |
       Email address used for ACME certificate registration.
@@ -83,7 +105,6 @@ properties:
       certificates before they actually expire. So you usually need not take
       action uppon receiving expiration notice when running Traefik.
     example: acme-certs-contact@example.com
-
   traefik.acme.staging:
     description: |
       Run on the staging Let's Encrypt server.
@@ -95,8 +116,48 @@ properties:
       the production server.
     default: true
 
+
+  traefik.api.enabled:
+    description: |
+      Whether the Traefik API and Dashboard should be enabled.
+
+      This will enable:
+        - A REST API endpoint.
+        - A web UI that can be used to dynamically read or modify the Traefik
+          configuration.
+        - A '/ping' endpoint for healthchecks.
+        - A metrics endpoint for Prometheus to scrape.
+
+      This BOSH Release only serves API and Dashboard on a TLS endpoint
+      protected by a Digest Auth username and password.
+
+      Please take care not exposing this endpoint to the entire Internet,
+      otherwise your server could get compromized by malicious users.
+    default: false
+  traefik.api.tls.port:
+    description: |
+      TCP port for the Traefik API and Dashboard.
+    default: 8443
+  traefik.api.tls.cert:
+    type: certificate
+    description: |
+      The TLS certificate to use for the API and Dashboard entrypoint.
+  traefik.api.tls.min_version:
+    description: |
+      The minimum TLS version to be used by the API and Dashboard entrypoint.
+    default: VersionTLS12
+  traefik.api.digest_auth.username:
+    description: |
+      Digest Auth username to access the Traefik API and Dashboard.
+  traefik.api.digest_auth.password:
+    description: |
+      Digest Auth password to access the Traefik API and Dashboard.
+
+
   traefik.web.enabled:
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       Whether the 'web' backend should be enabled.
 
       This will enable a REST API endpoint and a web UI that can be used to
@@ -106,9 +167,13 @@ properties:
     default: false
   traefik.web.basic_auth.username:
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       Basic Auth username to access the 'web' backend.
   traefik.web.basic_auth.password:
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       Basic Auth password to access the 'web' backend.
 
       This value will end up being (kind of) MD5-digested (like 'htpasswd'
@@ -116,11 +181,15 @@ properties:
       clear-text on the BOSH-managed Traefik nodes.
   traefik.web.readonly:
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       Whether the 'web' endpoint should be readonly, in which case the Traefik
       configuration can only be read and not modified through this backend.
     default: true
   traefik.web.port:
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       TCP port for the 'web' backend.
 
       We advise to set '8443' here when 'traefik.web.tls.enabled' is set to
@@ -128,12 +197,17 @@ properties:
     default: 8080
   traefik.web.tls.enabled:
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       Whether to activate TLS for the 'web' backend.
     default: false
   traefik.web.tls.cert:
     type: certificate
     description: |
+      DEPRECATED. See 'traefik.api.*' properties instead.
+
       The TLS certificate to use for the 'web' backend.
+
 
   traefik.file.enabled:
     description: |
