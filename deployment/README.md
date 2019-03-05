@@ -44,29 +44,12 @@ then use this operation file to remove it.
 This should not be enable when using the `enable-lets-encrypt.yml` ops file.
 
 
-### `operations/enable-web-backend.yml`
+### `operations/enable-api.yml`
 
-This operation file enables the `web` backend for viewing the Træfik config
-through a read-only web UI. This managment UI runs on port `8080` and is
-protected by a Basic Auth username and password.
-
-
-### `operations/enable-web-backend-tls.yml`
-
-Together with `enable-web-backend.yml`, this enables TLS on the `web` backend,
-and have it served on port `8443`.
-
-This is not compatible with the default `cf-integration.yml` ops file that
-assumes the `web` backend is accessible on th `8080` port in order to expose
-it on the main TLS entrypoint for a certain host.
-
-
-### `operations/enable-web-backend-readwrite.yml`
-
-This operation file enables the `web` backend for modifying the Træfik config
-through a read-only web UI and a read-write API. Enabling this is discouraged
-in production, unless proper access restrictions are applied on the `web`
-backend, and TLS is enabled.
+This operation file enables the `[api]` section of the configuration. This
+provides an HTTPS entry-point for viewing the Træfik config through a
+read-only web UI (but a read-write API). This managment UI runs on port `8443`
+and is protected by a Digest Auth username and password.
 
 
 ### `operations/static-ip.yml`
@@ -91,3 +74,35 @@ latest final version available. When iterating on newer versions of this BOSH
 release, you'll be interested in using the `latest` release that has been
 uploaded to the BOSH Director. This is exactly what's provided by this
 operations file.
+
+
+## Deprecated operations files
+
+
+### `operations/deprecated/enable-web-backend.yml`
+
+This operation file enables the `web` backend for viewing the Træfik config
+through a read-only web UI. This managment UI runs on port `8080` and is
+protected by a Basic Auth username and password.
+
+This alone is not compatible with the default `cf-integration.yml` ops file
+that assumes the `web` backend is accessible on th `8443` port in order to
+expose it on the main TLS entrypoint for a certain host. In such case, you'll
+also need the `enable-web-backend-tls.yml` ops file.
+
+
+### `operations/deprecated/enable-web-backend-tls.yml`
+
+Together with `enable-web-backend.yml`, this enables TLS on the `web` backend,
+and have it served on port `8443`.
+
+This is required when using `enable-web-backend.yml` with the
+`cf-integration.yml` ops file.
+
+
+### `operations/deprecated/enable-web-backend-readwrite.yml`
+
+This operation file enables the `web` backend for modifying the Træfik config
+through a read-only web UI and a read-write API. Enabling this is discouraged
+in production, unless proper access restrictions are applied on the `web`
+backend, and TLS is enabled.
