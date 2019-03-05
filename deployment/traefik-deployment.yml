@@ -36,6 +36,7 @@ variables:
       ca: traefikCA
       common_name: ((traefik_domain))
       alternative_names:
+        - ((traefik_domain))
         - "*.((traefik_domain))"
 
 update:
