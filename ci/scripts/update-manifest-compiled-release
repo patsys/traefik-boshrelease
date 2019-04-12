@@ -58,6 +58,6 @@ ${releases_updated}
 YAML
 }
 
-for manifest_path in $(ls manifests/*.yml); do
+for manifest_path in $MANIFESTS_PATHS; do
   bump_version $manifest_path
 done
