@@ -16,9 +16,9 @@ credhub set -n "/concourse/${team}/aws-secret-key"      -t value -v "$(bosh int 
 credhub set -n "/concourse/${team}/github-private-key"  -t value -v "$(bosh int ci/pipeline/secrets.yml --path /github_private_key)"
 credhub set -n "/concourse/${team}/github-access-token" -t value -v "$(bosh int ci/pipeline/secrets.yml --path /github_access_token)"
 
-credhub set -n "/concourse/${team}/${pipeline}/slack-username" -t value -v "concourse"
+credhub set -n "/concourse/${team}/${pipeline}/slack-username" -t value -v "gk-concourse-ninja"
 credhub set -n "/concourse/${team}/${pipeline}/slack-icon-url" -t value -v "https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png"
-credhub set -n "/concourse/${team}/${pipeline}/slack-webhook"  -t value -v "https://slack.com/skip-slack-for-now"
+credhub set -n "/concourse/${team}/${pipeline}/slack-webhook"  -t value -v "$(bosh int ci/pipeline/secrets.yml --path /slack_webhook)"
 
 credhub set -n "/concourse/${team}/bosh-lite-environment"   -t value -v "$(bosh int ci/pipeline/secrets.yml --path /bosh-lite-environment)"
 credhub set -n "/concourse/${team}/bosh-lite-ca-cert"       -t value -v "$(bosh int ci/pipeline/secrets.yml --path /bosh-lite-ca-cert)"

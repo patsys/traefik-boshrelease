@@ -19,7 +19,9 @@ meta:
   pipeline: (( concat meta.name "-boshrelease" ))
   manifest:
     path:   (( concat "deployment/" meta.name "-deployment.yml" ))
-    vars:   "--- {}"
+    vars: |
+      ---
+      traefik_domain: example.com
     vars-pr: (( grab meta.manifest.vars ))
     operator_file_paths: "" # comma separated list relative to repo root
 
