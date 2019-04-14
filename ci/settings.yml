@@ -6,7 +6,7 @@ meta:
 
   test-errands: ""
 
-  initial_version: 1.3.0
+  initial_version: "1.3.0"
 
   git:
     email:  ((git-commit-email))
