@@ -55,9 +55,9 @@ stemcells:
 
 releases:
 - name: traefik
-  sha1: 618a2c5a71ef25b855593d9f01b110a533a4e276
+  sha1: f7c2b3169ea5e504627adfe45a70f2ab12a82292
   stemcell:
     os: ubuntu-xenial
-    version: "250.29"
-  url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.4.0/traefik-1.4.0.tgz
+    version: "250.38"
+  url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.4.0-ubuntu-xenial-250.38-20190507-151650-800197035-20190507151651.tgz
   version: 1.4.0
