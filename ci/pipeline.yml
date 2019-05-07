@@ -55,6 +55,9 @@ meta:
     deployment:    (( concat meta.name "-testflight" ))
     deployment-pr: (( concat meta.name "-testflight-pr" ))
 
+  testflight:
+    latest_stable_stemcell_version_family: 250.latest
+
   slack:
     webhook:       (( param "Please specify your Slack Incoming Webhook Integration URL" ))
     success_moji:  ":airplane_departure:"
@@ -72,7 +75,7 @@ groups:
       - testflight-pr
       - rc
       - shipit
-      - compile-release-250
+      - compile-release
       - use-compiled-releases
   - name: versioning
     jobs:
@@ -377,13 +380,13 @@ jobs:
           icon_url: (( grab meta.slack.icon ))
           text:    '(( concat meta.slack.fail_url " " meta.pipeline ": shipit job failed" ))'
 
-  - name: compile-release-250
+  - name: compile-release
     plan:
       - aggregate:
         - get: git
         - get: github
           trigger: true
-        - get: ubuntu-xenial-stemcell-250
+        - get: latest-stable-ubuntu-stemcell
           params: {tarball: false}
       - task: export-release
         config:
@@ -395,7 +398,7 @@ jobs:
               tag:        (( grab meta.image.tag ))
           inputs:
             - name: git
-            - name: ubuntu-xenial-stemcell-250
+            - name: latest-stable-ubuntu-stemcell
               path: stemcell
             - name: github
               path: release
@@ -417,13 +420,13 @@ jobs:
       - aggregate:
         - get: git
         - get: github
-          passed: [compile-release-250]
+          passed: [compile-release]
           trigger: true
-        - get: ubuntu-xenial-stemcell-250
-          passed: [compile-release-250]
+        - get: latest-stable-ubuntu-stemcell
+          passed: [compile-release]
           params: {tarball: false}
         - get: compiled-release
-          passed: [compile-release-250]
+          passed: [compile-release]
       - task: use-compiled-releases
         config:
           platform: linux
@@ -434,7 +437,7 @@ jobs:
               tag:        (( grab meta.image.tag ))
           inputs:
             - name: git
-            - name: ubuntu-xenial-stemcell-250
+            - name: latest-stable-ubuntu-stemcell
               path: stemcell
             - name: github
               path: release
@@ -516,11 +519,11 @@ resources:
       access_key_id:     (( grab meta.aws.access_key ))
       secret_access_key: (( grab meta.aws.secret_key ))
 
-  - name: ubuntu-xenial-stemcell-250
+  - name: latest-stable-ubuntu-stemcell
     type: bosh-io-stemcell
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
-      version_family: 250.latest
+      version_family: ((latest_stable_stemcell_version_family))
 
   - name: compiled-release
     type: s3
