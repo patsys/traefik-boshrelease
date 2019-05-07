@@ -1,8 +1,8 @@
 ### Improvements
 
-- Bump Træfik to the latest version 1.7.10 (codename “Maroilles”, a delicious semi-liquid creamy French cheese, yummy!)
+- Bump Træfik to the latest version 1.7.10
 
 ### Notice
 
-- The `web` backend and related properties are now deprecated starting with this release version. You must use the `traefik.api.*` properties instead.
-- The `cf-integration.yml` ops file has migrated to using the `traefik.api.*` properties, using a TLS backend instead of an HTTP backend in the previous version.
+- The `web` backend and related properties are deprecated since `v1.3.0`.
+  Please migrate to the `traefik.api.*` properties instead.
