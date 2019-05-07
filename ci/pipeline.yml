@@ -523,7 +523,7 @@ resources:
     type: bosh-io-stemcell
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
-      version_family: ((latest_stable_stemcell_version_family))
+      version_family: (( grab meta.testflight.latest_stable_stemcell_version_family ))
 
   - name: compiled-release
     type: s3
