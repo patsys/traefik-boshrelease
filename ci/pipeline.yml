@@ -386,7 +386,7 @@ jobs:
         - get: git
         - get: github
           trigger: true
-        - get: latest-stable-ubuntu-stemcell
+        - get: (( concat "ubuntu-xenial-stemcell-" meta.testflight.latest_stable_stemcell_version_family ))
           params: {tarball: false}
       - task: export-release
         config:
@@ -398,7 +398,7 @@ jobs:
               tag:        (( grab meta.image.tag ))
           inputs:
             - name: git
-            - name: latest-stable-ubuntu-stemcell
+            - name: (( concat "ubuntu-xenial-stemcell-" meta.testflight.latest_stable_stemcell_version_family ))
               path: stemcell
             - name: github
               path: release
@@ -422,7 +422,7 @@ jobs:
         - get: github
           passed: [ (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family )) ]
           trigger: true
-        - get: latest-stable-ubuntu-stemcell
+        - get: (( concat "ubuntu-xenial-stemcell-" meta.testflight.latest_stable_stemcell_version_family ))
           passed: [ (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family )) ]
           params: {tarball: false}
         - get: compiled-release
@@ -437,7 +437,7 @@ jobs:
               tag:        (( grab meta.image.tag ))
           inputs:
             - name: git
-            - name: latest-stable-ubuntu-stemcell
+            - name: (( concat "ubuntu-xenial-stemcell-" meta.testflight.latest_stable_stemcell_version_family ))
               path: stemcell
             - name: github
               path: release
@@ -519,7 +519,7 @@ resources:
       access_key_id:     (( grab meta.aws.access_key ))
       secret_access_key: (( grab meta.aws.secret_key ))
 
-  - name: latest-stable-ubuntu-stemcell
+  - name: (( concat "ubuntu-xenial-stemcell-" meta.testflight.latest_stable_stemcell_version_family ))
     type: bosh-io-stemcell
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
