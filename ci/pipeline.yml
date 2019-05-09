@@ -56,7 +56,7 @@ meta:
     deployment-pr: (( concat meta.name "-testflight-pr" ))
 
   testflight:
-    latest_stable_stemcell_version_family: 250.latest
+    latest_stable_stemcell_version_family: "250"
 
   slack:
     webhook:       (( param "Please specify your Slack Incoming Webhook Integration URL" ))
@@ -75,7 +75,7 @@ groups:
       - testflight-pr
       - rc
       - shipit
-      - compile-release
+      - (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family ))
       - use-compiled-releases
   - name: versioning
     jobs:
@@ -380,7 +380,7 @@ jobs:
           icon_url: (( grab meta.slack.icon ))
           text:    '(( concat meta.slack.fail_url " " meta.pipeline ": shipit job failed" ))'
 
-  - name: compile-release
+  - name: (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family ))
     plan:
       - aggregate:
         - get: git
@@ -420,13 +420,13 @@ jobs:
       - aggregate:
         - get: git
         - get: github
-          passed: [compile-release]
+          passed: [ (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family )) ]
           trigger: true
         - get: latest-stable-ubuntu-stemcell
-          passed: [compile-release]
+          passed: [ (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family )) ]
           params: {tarball: false}
         - get: compiled-release
-          passed: [compile-release]
+          passed: [ (( concat "compile-release-" meta.testflight.latest_stable_stemcell_version_family )) ]
       - task: use-compiled-releases
         config:
           platform: linux
@@ -523,7 +523,7 @@ resources:
     type: bosh-io-stemcell
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
-      version_family: (( grab meta.testflight.latest_stable_stemcell_version_family ))
+      version_family: (( concat meta.testflight.latest_stable_stemcell_version_family ".latest" ))
 
   - name: compiled-release
     type: s3
