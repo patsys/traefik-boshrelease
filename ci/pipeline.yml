@@ -18,7 +18,7 @@ meta:
   url:      (( param "Please specify the full url of the target Concourse CI" ))
   pipeline: (( concat meta.name "-boshrelease" ))
   manifest:
-    path:   (( concat "deployment/" meta.name "-deployment.yml" ))
+    path:   (( concat meta.manifest.directory "/" meta.name "-deployment.yml" ))
     vars: |
       ---
       traefik_domain: example.com
@@ -342,7 +342,7 @@ jobs:
             GIT_NAME:       (( grab meta.git.name ))
             AWS_ACCESS_KEY:       (( grab meta.aws.access_key ))
             AWS_SECRET_KEY:       (( grab meta.aws.secret_key ))
-            MANIFESTS_PATHS: (( grab meta.manifest.path ))
+            MANIFESTS_DIR: (( grab meta.manifest.directory ))
 
       - name: upload-git
         put: git
@@ -452,7 +452,7 @@ jobs:
             GIT_EMAIL: (( grab meta.git.email ))
             GIT_NAME:  (( grab meta.git.name ))
             BRANCH:    (( grab meta.github.branch ))
-            MANIFESTS_PATHS: (( grab meta.manifest.path ))
+            MANIFESTS_DIR: (( grab meta.manifest.directory ))
       - name: upload-git
         put: git
         params:

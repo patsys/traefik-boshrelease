@@ -8,6 +8,9 @@ meta:
 
   initial_version: "1.3.0"
 
+  manifest:
+    directory: deployment
+
   git:
     email:  ((git-commit-email))
     name:   ((git-commit-name))
