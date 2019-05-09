@@ -1,4 +1,4 @@
-traefik/traefik-1.7.10_linux-amd64.gz:
-  size: 19640617
-  object_id: cb05e381-ac8c-43e6-6b76-6b7636bada16
-  sha: c2b3c65672533240f0c5237bd89d3d807016707d
+traefik/traefik-1.7.11_linux-amd64.gz:
+  size: 19818271
+  object_id: 7d911a47-7891-4e32-4238-849a625845b2
+  sha: sha256:81c8ff3670d0c708439d306a774341ea162df6bc429d4f7cdfab42386b296a92
