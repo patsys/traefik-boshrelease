@@ -23,7 +23,7 @@ meta:
 
   aws:
     bucket:      (( grab meta.pipeline ))
-    region_name: eu-west-3 # us-east-1
+    region_name: eu-west-3
     access_key:  ((aws-access-key))
     secret_key:  ((aws-secret-key))
 
