@@ -48,7 +48,19 @@
           entrypoints = [ "https" ]
           priority = 10
           backend = "cf-tls-backend"
+
           passHostHeader = true
+          [frontends.cf-tls-frontend.passTLSClientCert]
+
+            # Escaped pem is added to a `X-Forwarded-Tls-Client-Cert` header.
+            #
+            # This is unfortunately not compatible (yet) with the
+            # `X-Forwarded-Client-Cert` header that is expected by Cloud
+            # Foundry Gorouters.
+            pem = true
+
+            # See <https://docs.traefik.io/configuration/commons/#pass-tls-client-cert>
+            # for more options.
 
           [frontends.cf-tls-frontend.routes]
             [frontends.cf-tls-frontend.routes.catch-all-tls]
