@@ -25,7 +25,8 @@ meta:
       frontend_hostname: mockbin.example.com
       api_hostname: traefik.example.com
     vars-pr: (( grab meta.manifest.vars ))
-    operator_file_paths: "" # comma separated list relative to repo root
+    operator_file_paths: # comma separated list relative to repo root
+      (( concat meta.manifest.directory "/operations/testflight/smoke-tests-setup.yml" ))
 
   git:
     email:  (( param "Please provide the git email for automated commits" ))
