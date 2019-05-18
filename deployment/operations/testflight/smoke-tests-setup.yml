@@ -54,11 +54,8 @@
               rule = "Host: ((frontend_hostname))"
     watch: true
 
-- path: /instance_groups/name=traefik/jobs/name=smoke-tests?
+- path: /instance_groups/name=traefik/jobs/name=smoke-tests/properties?
   type: replace
   value:
-    name: smoke-tests
-    release: traefik
-    properties:
-      frontend_hostname: ((frontend_hostname))
-      api_hostname: ((api_hostname))
+    frontend_hostname: ((frontend_hostname))
+    api_hostname: ((api_hostname))
