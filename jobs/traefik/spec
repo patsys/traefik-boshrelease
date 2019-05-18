@@ -17,6 +17,21 @@ templates:
 packages:
   - traefik
 
+provides:
+  - name: traefik
+    type: traefik
+    properties:
+      - traefik.http.enabled
+      - traefik.http.port
+      - traefik.tls.enabled
+      - traefik.tls.port
+      - traefik.tls.cert
+      - traefik.api.enabled
+      - traefik.api.tls.port
+      - traefik.api.tls.cert
+      - traefik.api.digest_auth.username
+      - traefik.api.digest_auth.password
+
 properties:
   traefik.debug:
     description: |

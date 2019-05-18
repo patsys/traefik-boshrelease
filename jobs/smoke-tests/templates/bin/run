@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+<%
+    require "shellwords"
+    def esc(x)
+        Shellwords.shellescape(x)
+    end
+
+    traefik = link("traefik")
+
+    adm_username = traefik.p("traefik.api.digest_auth.username")
+    adm_password = traefik.p("traefik.api.digest_auth.password")
+
+    if traefik.p("traefik.tls.enabled")
+        pxy_scheme = "https"
+        pxy_port = traefik.p("traefik.tls.port")
+    else
+        pxy_scheme = "http"
+        pxy_port = traefik.p("traefik.http.port")
+    end
+
+    api_tls_port = traefik.p("traefik.api.tls.port")
+
+    main_address = traefik.instances.first.address
+-%>
+
+set -eo pipefail
+
+function prepend_datetime() {
+    awk -W interactive '{ system("echo -n [$(date +%FT%T%z)]"); print " " $0 }'
+}
+
+exec \
+    3>&1 \
+    1> >(prepend_datetime >&3) \
+    2>&1
+
+readonly API_BASE_URI=<%= esc("https://#{main_address}:#{api_tls_port}") %>
+readonly PXY_BASE_URI=<%= esc("#{pxy_scheme}://#{main_address}:#{pxy_port}") %>
+
+# setup cleanup framework
+defer_stack=()
+function defer() {
+    local function_name=$1
+
+    local new_stack=("${function_name}")
+    new_stack+=("${defer_stack[@]}")
+
+    defer_stack=("${new_stack[@]}")
+}
+function run_deferred() {
+    for fn in "${defer_stack[@]}"; do
+        "${fn}"
+    done
+}
+
+trap run_deferred EXIT
+
+# setup .netrc for curl to fetch the login name and password
+export HOME=/var/vcap/data/smoke-tests/fake-home
+mkdir -p "${HOME}"
+touch "${HOME}/.netrc"
+chmod 600 "${HOME}/.netrc" # restrict access before writing content
+echo <%= esc("machine #{main_address} login #{adm_username} password #{adm_password}") %> \
+    > "${HOME}/.netrc"
+
+function cleanup_netrc() {
+    rm -f "${HOME}/.netrc"
+}
+defer cleanup_netrc
+
+function request() {
+    local base=$1 ca_name=$2 verb=$3 uri_path=$4; shift 4
+
+    (
+        set -x
+        curl --silent --fail --show-error --location \
+            --cacert "/var/vcap/jobs/smoke-tests/tls/${ca_name}.crt" \
+            --request "${verb}" \
+            --url "${base}${uri_path}" \
+            "$@" \
+            --include
+    )
+}
+
+function api() {
+    request "${API_BASE_URI}" "api-entrypoint-ca" "$@" --netrc --digest
+}
+
+function proxy() {
+    request "${PXY_BASE_URI}" "traefik-default-ca" "$@"
+}
+
+api GET "/dashboard/" \
+        --header "Host: "<%= esc(p("api_hostname")) %>
+echo $'\n'
+
+# # send a request through the API
+# proxy GET "/request?toto=titi&tata=tutu" \
+#         --header "Host: "<%= esc(p("frontend_hostname")) %> \
+#         --header "Content-Type: application/json" \
+#         --data-raw '{"plip": "plop"}' \
+#     | tr -d '\r' | sed -e '/^$/,$d' # only display the HTTP response headers
+# echo $'\n'
+
+exit 0

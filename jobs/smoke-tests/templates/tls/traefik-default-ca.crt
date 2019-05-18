@@ -1,0 +1,6 @@
+<%
+    traefik = link("traefik")
+    if traefik.p("traefik.tls.enabled")
+-%>
+<%= traefik.p("traefik.tls.cert.ca", "") -%>
+<% end -%>

@@ -1,0 +1,24 @@
+---
+name: smoke-tests
+
+templates:
+  bin/run: bin/run
+  tls/api-entrypoint-ca.crt: tls/api-entrypoint-ca.crt
+  tls/traefik-default-ca.crt: tls/traefik-default-ca.crt
+
+packages: []
+
+consumes:
+  - name: traefik
+    type: traefik
+
+properties:
+  frontend_hostname:
+    description: |
+      Hostname to query when querying the Traefik frontend.
+    default: mockbin.example.com
+
+  api_hostname:
+    description: |
+      Hostname to use when querying the Traefik API.
+    default: traefik.example.com

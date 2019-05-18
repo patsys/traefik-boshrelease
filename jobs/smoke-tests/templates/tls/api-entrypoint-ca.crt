@@ -1,0 +1,1 @@
+<%= link("traefik").p("traefik.api.tls.cert.ca", "") -%>

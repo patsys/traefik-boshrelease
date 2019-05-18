@@ -22,6 +22,8 @@ meta:
     vars: |
       ---
       traefik_domain: example.com
+      frontend_hostname: mockbin.example.com
+      api_hostname: traefik.example.com
     vars-pr: (( grab meta.manifest.vars ))
     operator_file_paths: "" # comma separated list relative to repo root
 

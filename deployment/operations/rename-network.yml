@@ -1,5 +1,0 @@
----
-
-- path: /instance_groups/name=traefik/networks/name=default/name
-  type: replace
-  value: ((network_name))
