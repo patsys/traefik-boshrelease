@@ -1,6 +1,6 @@
 ### Improvements
 
-- Add support for running Træfik with BPM (see #6)
+- Add support for running Traefik with BPM (see #6)
 
 - Improve smoke tests (see #7) so that they can run along with the
   `cf-integration.yml` enabled, and test some backend/frontend basic setups.
