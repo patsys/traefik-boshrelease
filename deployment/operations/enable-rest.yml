@@ -1,0 +1,5 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/rest?/enabled
+  type: replace
+  value: true
