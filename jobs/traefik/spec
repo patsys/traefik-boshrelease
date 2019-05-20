@@ -187,6 +187,16 @@ properties:
       Digest Auth password to access the Traefik API and Dashboard.
 
 
+  traefik.rest.enabled:
+    description: |
+      Whether the REST provider is enabled or not.
+
+      When enabled, the REST provider is served on the same entrypoint as the
+      API. Then the Traefik API is no more read-only, and the configuration
+      can be modified dynamically through the API.
+    default: false
+
+
   traefik.web.enabled:
     description: |
       DEPRECATED. See 'traefik.api.*' properties instead.

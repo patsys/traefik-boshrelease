@@ -427,6 +427,7 @@ filePath = "/var/vcap/sys/log/traefik/access.log"
 
 
 
+
 <% if p('traefik.api.enabled') -%>
 ################################################################
 # API and dashboard configuration
@@ -584,6 +585,24 @@ filePath = "/var/vcap/sys/log/traefik/access.log"
     # Default: ""
     #
     # retentionpolicy = ""
+<% end -%>
+
+
+
+
+<% if p("traefik.rest.enabled") -%>
+################################################################
+# Rest Provider
+################################################################
+
+# Enable REST Provider.
+[rest]
+  # Name of the related entry point
+  #
+  # Optional
+  # Default: "traefik"
+  #
+  entryPoint = "traefik-api"
 <% end -%>
 
 
