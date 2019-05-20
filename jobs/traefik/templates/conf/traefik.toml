@@ -327,7 +327,7 @@ logLevel = "<%= p('traefik.log_level') %>"
 # Optional
 # Default: os.Stdout
 #
-filePath = "/var/vcap/data/sys/log/traefik/traefik.log"
+filePath = "/var/vcap/sys/log/traefik/traefik.log"
 
 # Format is either "json" or "common".
 #
@@ -357,7 +357,7 @@ filePath = "/var/vcap/data/sys/log/traefik/traefik.log"
 # Optional
 # Default: os.Stdout
 #
-filePath = "/var/vcap/data/sys/log/traefik/access.log"
+filePath = "/var/vcap/sys/log/traefik/access.log"
 
 # Format is either "json" or "common".
 #
