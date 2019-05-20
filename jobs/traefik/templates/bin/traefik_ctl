@@ -31,7 +31,8 @@ case $1 in
 <%
     if p('traefik.http.port') < 1024 or
         p('traefik.tls.port') < 1024 or
-        p('traefik.web.port') < 1024
+        p('traefik.web.port') < 1024 or
+        p('traefik.api.tls.port') < 1024
 -%>
         exec /var/vcap/packages/traefik/bin/traefik \
             -c /var/vcap/jobs/traefik/conf/traefik.toml

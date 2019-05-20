@@ -38,8 +38,8 @@ properties:
       Whether to enable debug mode.
 
       This mode should never be enabled in production because it exposes
-      internal state of the Traefik server that malicious users should not have
-      access to.
+      internal state of the Traefik server that malicious users should not
+      have access to.
 
       This will install HTTP handlers to expose Go expvars under /debug/vars
       and pprof profiling data under /debug/pprof.
@@ -81,6 +81,9 @@ properties:
   traefik.http.port:
     description: |
       TCP port for the HTTP entrypoint.
+
+      When this port and 'traefik.tls.port' are above 1024, then Traefik runs
+      as 'vcap' instead of 'root'.
     default: 80
   traefik.http.redirect_to_https:
     description: |
@@ -96,6 +99,9 @@ properties:
   traefik.tls.port:
     description: |
       TCP port for the HTTPS entrypoint.
+
+      When this port and 'traefik.http.port' are above 1024, then Traefik runs
+      as 'vcap' instead of 'root'.
     default: 443
   traefik.tls.cert:
     type: certificate
