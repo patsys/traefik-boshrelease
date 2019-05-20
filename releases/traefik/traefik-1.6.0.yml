@@ -1,0 +1,26 @@
+name: traefik
+version: 1.6.0
+commit_hash: bc2036b
+uncommitted_changes: false
+jobs:
+- name: smoke-tests
+  version: c5d12c63c8f3f7007bb3eb9c03cf9bd593a874a1481aa34a0cfdb01ceebe48f2
+  fingerprint: c5d12c63c8f3f7007bb3eb9c03cf9bd593a874a1481aa34a0cfdb01ceebe48f2
+  sha1: sha256:059097658a1254e216334cf33d0fa440b1a4f0d0531e4a5f095d945b5029d57b
+  packages: []
+- name: traefik
+  version: 1911d0785e0233ea15bae97aee83ef18eb9014ed081144d73e3bcf47ccc70003
+  fingerprint: 1911d0785e0233ea15bae97aee83ef18eb9014ed081144d73e3bcf47ccc70003
+  sha1: sha256:c568d95b50c755e806268ca54032a86fefdaeb040a374359fb4431ca5710be5e
+  packages:
+  - traefik
+packages:
+- name: traefik
+  version: 8ac9ee0b87b7010332f88f11a21ff994b127e6493859f3dc1f0da493e41c62f8
+  fingerprint: 8ac9ee0b87b7010332f88f11a21ff994b127e6493859f3dc1f0da493e41c62f8
+  sha1: sha256:f48ff5934b5eee9c45e6a399b486618d9c425879d5899ff330bba5f466b72352
+  dependencies: []
+license:
+  version: fa8c76e69c0d7a45f68807e8d5381bde68b3751ce779c6ecc1856045ecb1805a
+  fingerprint: fa8c76e69c0d7a45f68807e8d5381bde68b3751ce779c6ecc1856045ecb1805a
+  sha1: sha256:f34c47ec1835474a2acacca9d312468573fab2797637f9d9c5440cbb3d675ad8
