@@ -1,5 +1,11 @@
 check process traefik
-  with pidfile /var/vcap/data/sys/run/traefik/traefik.pid
+<% if p("bpm.enabled") -%>
+  with pidfile /var/vcap/sys/run/bpm/traefik/traefik.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start traefik"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop traefik"
+<% else -%>
+  with pidfile /var/vcap/sys/run/traefik/traefik.pid
   start program "/var/vcap/jobs/traefik/bin/traefik_ctl start"
   stop program "/var/vcap/jobs/traefik/bin/traefik_ctl stop"
+<% end -%>
   group vcap

@@ -327,7 +327,9 @@ logLevel = "<%= p('traefik.log_level') %>"
 # Optional
 # Default: os.Stdout
 #
+<% if not p("bpm.enabled") -%>
 filePath = "/var/vcap/sys/log/traefik/traefik.log"
+<% end -%>
 
 # Format is either "json" or "common".
 #

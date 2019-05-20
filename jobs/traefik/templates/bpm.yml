@@ -1,0 +1,15 @@
+---
+processes:
+  - name: traefik
+    hooks:
+      pre_start: /var/vcap/jobs/traefik/bin/bpm-prestart
+    executable: /var/vcap/packages/traefik/bin/traefik
+    args:
+      - -c
+      - /var/vcap/jobs/traefik/conf/traefik.toml
+    capabilities:
+      # Allow Traefik to bind sockets to Internet domain privileged ports
+      # (port numbers less than 1024):
+      - NET_BIND_SERVICE
+    ephemeral_disk: true
+    persistent_disk: true

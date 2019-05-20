@@ -5,6 +5,8 @@ description: This job runs a Traefik reverse-proxy.
 
 templates:
   bin/traefik_ctl: bin/traefik_ctl
+  bin/bpm-prestart: bin/bpm-prestart
+  bpm.yml: config/bpm.yml
   conf/traefik.toml: conf/traefik.toml
   conf/rules.toml: conf/rules.toml
   tls/traefik-default.crt: tls/traefik-default.crt
@@ -33,6 +35,12 @@ provides:
       - traefik.api.digest_auth.password
 
 properties:
+  bpm.enabled:
+    description: |
+      Switch to BPM (Bosh Process Manager) for running Traefik. This brings
+      the benefit of improved security measures at runtime.
+    default: false
+
   traefik.debug:
     description: |
       Whether to enable debug mode.
@@ -82,8 +90,10 @@ properties:
     description: |
       TCP port for the HTTP entrypoint.
 
-      When this port and 'traefik.tls.port' are above 1024, then Traefik runs
-      as 'vcap' instead of 'root'.
+      When 'bpm.enabled' is 'false' and both this port and 'traefik.tls.port'
+      (as well as 'traefik.api.tls.port' and the deprecated
+      'traefik.web.port') are above 1024, then Traefik runs as 'vcap' instead
+      of 'root'.
     default: 80
   traefik.http.redirect_to_https:
     description: |
@@ -100,8 +110,10 @@ properties:
     description: |
       TCP port for the HTTPS entrypoint.
 
-      When this port and 'traefik.http.port' are above 1024, then Traefik runs
-      as 'vcap' instead of 'root'.
+      When 'bpm.enabled' is 'false' and both this port and 'traefik.http.port'
+      (as well as 'traefik.api.tls.port' and the deprecated
+      'traefik.web.port') are above 1024, then Traefik runs as 'vcap' instead
+      of 'root'.
     default: 443
   traefik.tls.cert:
     type: certificate
