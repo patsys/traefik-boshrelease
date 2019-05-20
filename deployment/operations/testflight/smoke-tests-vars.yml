@@ -1,3 +1,2 @@
 ---
 smoke_tests_frontend_hostname: mockbin.example.com
-smoke_tests_api_hostname: traefik.example.com

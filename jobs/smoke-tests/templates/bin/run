@@ -85,7 +85,6 @@ function request() {
 
 function api() {
     request "${API_BASE_URI}" "api-entrypoint-ca" "$@" \
-        --header "Host: "<%= esc(p("api_hostname")) %> \
         --header "Content-Type: application/json" \
         --netrc --digest
 }

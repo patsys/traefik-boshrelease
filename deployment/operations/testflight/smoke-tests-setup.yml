@@ -14,7 +14,6 @@
     # NOTE: when 'frontend_hostname' is a DNS name for which no Let's Encrypt
     # certificate can be provisioned, then Let's Encrypt must be deactivated.
     frontend_hostname: ((smoke_tests_frontend_hostname))
-    api_hostname: ((smoke_tests_api_hostname))
 
 
 

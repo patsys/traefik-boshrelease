@@ -21,8 +21,3 @@ properties:
       certificate can be provisioned (like 'mockbin.example.com'), then Let's
       Encrypt must be deactivated.
     default: mockbin.example.com
-
-  api_hostname:
-    description: |
-      Hostname to use when querying the Traefik API.
-    default: traefik.example.com
