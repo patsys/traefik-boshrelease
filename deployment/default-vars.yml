@@ -1,0 +1,3 @@
+---
+deployment_name: traefik
+network_name: default
