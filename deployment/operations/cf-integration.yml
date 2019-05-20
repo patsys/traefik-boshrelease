@@ -1,6 +1,6 @@
 ---
 
-- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/accept_invalid_backend_certificates
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/accept_invalid_backend_certificates?
   type: replace
   value: true
 
@@ -74,3 +74,11 @@
 - path: /instance_groups/name=traefik/vm_extensions?/-
   type: replace
   value: traefik-loadbalancer
+
+
+
+# Smoke tests support
+
+- path: /instance_groups/name=traefik/jobs/name=smoke-tests/properties?/api_hostname
+  type: replace
+  value: ((web_backend_hostname))

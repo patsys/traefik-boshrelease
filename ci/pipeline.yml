@@ -25,12 +25,13 @@ meta:
       network_name: default
       traefik_domain: example.com
       api_username: admin-testflight
-      frontend_hostname: mockbin.example.com
-      api_hostname: traefik.example.com
+      smoke_tests_frontend_hostname: mockbin.example.com
+      smoke_tests_api_hostname: traefik.example.com
     vars-pr: (( grab meta.manifest.vars ))
     operator_file_paths: # comma (or space) separated list relative to repo root
-      deployment/operations/enable-api.yml
       deployment/operations/testflight/smoke-tests-setup.yml
+      deployment/operations/enable-api.yml
+      deployment/operations/enable-rest.yml
 
   git:
     email:  (( param "Please provide the git email for automated commits" ))

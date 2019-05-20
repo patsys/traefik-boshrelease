@@ -1,61 +1,34 @@
 ---
 
-- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/accept_invalid_backend_certificates
+# Depends on: 'enable-api.yml' & 'enable-rest.yml'
+
+
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/accept_invalid_backend_certificates?
   type: replace
   value: true
-
-- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/file?
-  type: replace
-  value:
-    enabled: true
-    rules: |
-      [backends]
-        [backends.traefik-ui]
-          [backends.traefik-ui.servers.server1]
-          url = "https://127.0.0.1:8443"
-
-        [backends.mockbin-http-backend]
-          [backends.mockbin-http-backend.servers.http]
-          url = "http://mockbin.org:80"
-
-        [backends.mockbin-tls-backend]
-          [backends.mockbin-tls-backend.servers.tls]
-          url = "https://mockbin.org:443"
-
-      [frontends]
-        [frontends.traefik-ui]
-          entrypoints = [ "https" ]
-          priority = 20
-          backend = "traefik-ui"
-          passHostHeader = true
-
-          [frontends.traefik-ui.routes]
-            [frontends.traefik-ui.routes.route1]
-              rule = "Host: ((api_hostname))"
-
-        [frontends.mockbin-http-frontend]
-          entrypoints = [ "http" ]
-          priority = 10
-          backend = "mockbin-http-backend"
-          passHostHeader = true
-
-          [frontends.mockbin-http-frontend.routes]
-            [frontends.mockbin-http-frontend.routes.http]
-              rule = "Host: ((frontend_hostname))"
-
-        [frontends.mockbin-tls-frontend]
-          entrypoints = [ "https" ]
-          priority = 10
-          backend = "mockbin-tls-backend"
-          passHostHeader = true
-
-          [frontends.mockbin-tls-frontend.routes]
-            [frontends.mockbin-tls-frontend.routes.tls]
-              rule = "Host: ((frontend_hostname))"
-    watch: true
 
 - path: /instance_groups/name=traefik/jobs/name=smoke-tests/properties?
   type: replace
   value:
-    frontend_hostname: ((frontend_hostname))
-    api_hostname: ((api_hostname))
+    # NOTE: when 'frontend_hostname' is a DNS name for which no Let's Encrypt
+    # certificate can be provisioned, then Let's Encrypt must be deactivated.
+    frontend_hostname: ((smoke_tests_frontend_hostname))
+    api_hostname: ((smoke_tests_api_hostname))
+
+
+
+# Safeguards
+
+# Systematic redirect from HTTP to HTTPS should be deactivated, in order for
+# the HTTP tests to actually test the HTTP frontend/backend setup.
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/http/redirect_to_https?
+  type: replace
+  value: false
+
+# Let's Encrypt is to be deactivated when 'mockbin.example.com' is used,
+# otherwise the Let's Encrypt certificate provisioning failure makes the smoke
+# tests fail.
+- path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik?/acme/enabled
+  type: replace
+  value: false

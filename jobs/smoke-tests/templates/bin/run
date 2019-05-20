@@ -21,6 +21,7 @@
     api_tls_port = traefik.p("traefik.api.tls.port")
 
     main_address = traefik.instances.first.address
+    frontend_hostname = p("frontend_hostname")
 -%>
 
 set -eo pipefail
@@ -35,7 +36,7 @@ exec \
     2>&1
 
 readonly API_BASE_URI=<%= esc("https://#{main_address}:#{api_tls_port}") %>
-readonly PXY_BASE_URI=<%= esc("#{pxy_scheme}://#{main_address}:#{pxy_port}") %>
+readonly PXY_BASE_URI=<%= esc("#{pxy_scheme}://#{frontend_hostname}:#{pxy_port}") %>
 
 # setup cleanup framework
 defer_stack=()
@@ -83,23 +84,117 @@ function request() {
 }
 
 function api() {
-    request "${API_BASE_URI}" "api-entrypoint-ca" "$@" --netrc --digest
+    request "${API_BASE_URI}" "api-entrypoint-ca" "$@" \
+        --header "Host: "<%= esc(p("api_hostname")) %> \
+        --header "Content-Type: application/json" \
+        --netrc --digest
 }
 
-function proxy() {
-    request "${PXY_BASE_URI}" "traefik-default-ca" "$@"
+function proxy_https() {
+    local main_address=<%= esc("#{main_address}") %>
+    if [[ ! "${main_address}" =~ "^[0-9.]+$" ]]; then
+        main_address=$(host "${main_address}" | head -n1 | cut -d" " -f4)
+    fi
+    request "${PXY_BASE_URI}" "traefik-default-ca" "$@" \
+        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${main_address}" \
+        --insecure
+}
+
+function proxy_http() {
+    local main_address=<%= esc("#{main_address}") %>
+    if [[ ! "${main_address}" =~ "^[0-9.]+$" ]]; then
+        main_address=$(host "${main_address}" | head -n1 | cut -d" " -f4)
+    fi
+    request <%= esc("http://#{frontend_hostname}:80") %> "traefik-default-ca" "$@" \
+        --resolve <%= esc("#{frontend_hostname}") %>":80:${main_address}" \
+        --resolve <%= esc("#{frontend_hostname}:#{pxy_port}") %>":${main_address}" \
+        --insecure
+}
+
+function cleanup_rest_provider_config() {
+    api PUT "/api/providers/rest" \
+            --data-raw '{}' \
+        | tr -d '\r' \
+        | sed -e 's/^Www-Authenticate:.*$/Www-Authenticate: <redacted>/i;
+                s/^Authorization:.*$/Authorization: <redacted>/i'
+    echo $'\n'
 }
 
 api GET "/dashboard/" \
-        --header "Host: "<%= esc(p("api_hostname")) %>
+    | tr -d '\r' \
+    | sed -e 's/^Www-Authenticate:.*$/Www-Authenticate: <redacted>/i;
+            s/^Authorization:.*$/Authorization: <redacted>/i'
 echo $'\n'
 
-# # send a request through the API
-# proxy GET "/request?toto=titi&tata=tutu" \
-#         --header "Host: "<%= esc(p("frontend_hostname")) %> \
-#         --header "Content-Type: application/json" \
-#         --data-raw '{"plip": "plop"}' \
-#     | tr -d '\r' | sed -e '/^$/,$d' # only display the HTTP response headers
-# echo $'\n'
+defer "cleanup_rest_provider_config"
+api PUT "/api/providers/rest" \
+        --data-raw '{
+            "frontends": {
+                "mockbin-http-frontend": {
+                    "entryPoints": [ "http" ],
+                    "priority": 20,
+                    "backend": "mockbin-http-backend",
+                    "passHostHeader": false,
+                    "routes": {
+                        "http-route": {
+                            "rule": "Host: '<%= esc("#{frontend_hostname}") %>'"
+                        }
+                    }
+                },
+                "mockbin-https-frontend": {
+                    "entryPoints": [ "https" ],
+                    "priority": 20,
+                    "backend": "mockbin-https-backend",
+                    "passHostHeader": false,
+                    "routes": {
+                        "https-route": {
+                            "rule": "Host: '<%= esc("#{frontend_hostname}") %>'"
+                        }
+                    }
+                }
+            },
+            "backends": {
+                "mockbin-http-backend": {
+                    "servers": {
+                        "http-server": {
+                            "url": "http://mockbin.org:80",
+                            "weight": 0
+                        }
+                    },
+                    "loadBalancer": {
+                        "method": "wrr"
+                    }
+                },
+                "mockbin-https-backend": {
+                    "servers": {
+                        "https-server": {
+                            "url": "https://mockbin.org:443",
+                            "weight": 0
+                        }
+                    },
+                    "loadBalancer": {
+                        "method": "wrr"
+                    }
+                }
+            }
+        }' \
+    | tr -d '\r' \
+    | sed -e 's/^Www-Authenticate:.*$/Www-Authenticate: <redacted>/i;
+            s/^Authorization:.*$/Authorization: <redacted>/i'
+echo $'\n'
+
+sleep 3 # wait for the new configuration to take effect
+
+# send an HTTP request through the configured frontend/backend
+proxy_http GET "/request?toto=titi&tata=tutu" \
+        --header "Content-Type: application/json" \
+        --data-raw '{"plip": "plop"}'
+echo $'\n'
+
+# send an HTTPS request through the configured frontend/backend
+proxy_https GET "/request?toto=titi&tata=tutu" \
+        --header "Content-Type: application/json" \
+        --data-raw '{"plip": "plop"}'
+echo $'\n'
 
 exit 0

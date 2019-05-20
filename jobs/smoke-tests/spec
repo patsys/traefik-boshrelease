@@ -16,6 +16,10 @@ properties:
   frontend_hostname:
     description: |
       Hostname to query when querying the Traefik frontend.
+
+      When 'frontend_hostname' is a DNS name for which no Let's Encrypt
+      certificate can be provisioned (like 'mockbin.example.com'), then Let's
+      Encrypt must be deactivated.
     default: mockbin.example.com
 
   api_hostname:
