@@ -179,6 +179,11 @@ properties:
     description: |
       The minimum TLS version to be used by the API and Dashboard entrypoint.
     default: VersionTLS12
+  traefik.api.digest_auth.realm:
+    description: |
+      Digest Auth realm to authenticate to when accessing the Traefik API and
+      Dashboard.
+    default: traefik
   traefik.api.digest_auth.username:
     description: |
       Digest Auth username to access the Traefik API and Dashboard.
