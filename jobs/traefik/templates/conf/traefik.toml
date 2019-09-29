@@ -985,6 +985,15 @@ password = "<%= p("traefik.etcd.credentials.password") %>"
 #
 <% if !p("traefik.etcd.tls").compact.empty? -%>
   [etcd.tls]
+    <% if_p("traefik.etcd.tls.ca") do |ca| %>
+    ca = "<%= ca.gsub(/\n/, "\\n") %>"
+    <% end %>
+    <% if_p("traefik.etcd.tls.key") do |key| %>
+    key = "<%= key.gsub(/\n/, "\\n") %>"
+    <% end %>
+    <% if_p("traefik.etcd.tls.cert") do |cert| %>
+    cert = "<%= cert.gsub(/\n/, "\\n")  %>"
+    <% end %>
     insecureSkipVerify = <%= p("traefik.etcd.tls.insecureSkipVerify","true") %>
 <% end -%>
 <% end -%> 

@@ -327,7 +327,7 @@ properties:
   traefik.etcd.endpoint:
     description: |
       Etcd endpoint
-    default: 127.0.0.1:2379
+    default: localhost:2379
   traefik.etcd.watch:
     description: |
       Etcd watch changes
