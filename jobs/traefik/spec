@@ -345,6 +345,10 @@ properties:
   traefik.etcd.tls.ca:
     description: |
       Etcd ca
+  traefik.etcd.api_v3:
+    discripion: |
+      Use Etcd Api v3 not v2
+    default: true
   traefik.etcd.tls.cert:
     description: |
       Etcd cert

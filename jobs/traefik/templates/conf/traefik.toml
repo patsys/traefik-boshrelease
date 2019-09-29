@@ -979,6 +979,10 @@ username = "<%= p("traefik.etcd.credentials.username") %>"
 password = "<%= p("traefik.etcd.credentials.password") %>"
 <% end -%>
 
+<% if p("traefik.etcd.api_v3") %>
+useAPIV3 = true
+<% end %>
+
 # Enable etcd TLS connection.
 #
 # Optional
