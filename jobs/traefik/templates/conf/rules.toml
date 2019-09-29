@@ -1,1 +1,30 @@
+<% if_link("http_backend") do |backend| %>
+[backends]
+  [backends.autoconf]
+    [backends.autoconf.servers]
+      <% backend.instances.each_with_index do |instance,i| %> 
+      [backends.autoconf.servers.server<%= i %>]
+        url = "http://<%= instance.address %>"
+        weight = 1
+      <% end %>
+      [backends.autoconf.circuitBreaker]
+        expression = "NetworkErrorRatio() > 0.5"
+      [backends.autoconf.responseForwarding]
+        flushInterval = "100ms"
+      [backends.autoconf.loadBalancer]
+        method = "wrr"
+      [backends.autoconf.maxConn]
+        amount = 50
+        extractorfunc = "request.host"
+[frontends]
+  [frontends.autoconf]
+    entrypoints = [ "http","https" ]
+    backend = "autoconf"
+    passHostHeader = true
+    priority = 1
+  [frontends.autoconf.routes]
+    [frontends.autoconf.routes.catch-all-http]
+      # Workaround for a catch-all rule:
+      rule = "HostRegexp: {dummy:[-.[:alnum:]_]+}"
+<% end %>
 <% if_p('traefik.file.rules') do |rules| %><%= rules %><% end %>

@@ -19,6 +19,11 @@ templates:
 packages:
   - traefik
 
+consumes:
+- name: http_backend
+  type: http-router
+  optional: true
+
 provides:
   - name: traefik
     type: traefik
@@ -314,3 +319,38 @@ properties:
     description: |
       Whether Traefik should watch the rules file for any dynamic change.
     default: false
+
+  traefik.etcd.enabled:
+    description: |
+      Whether the 'etcd' backend should be enabled.
+    default: false
+  traefik.etcd.endpoint:
+    description: |
+      Etcd endpoint
+    default: 127.0.0.1:2379
+  traefik.etcd.watch:
+    description: |
+      Etcd watch changes
+    default: true
+  traefik.etcd.prefix:
+    description: |
+      Etcd prefix
+    default: "/traefik"
+  traefik.etcd.credentials.username:
+    description: |
+      Etcd username
+  traefik.etcd.credentials.password:
+    description: |
+      Etcd password
+  traefik.etcd.tls.ca:
+    description: |
+      Etcd ca
+  traefik.etcd.tls.cert:
+    description: |
+      Etcd cert
+  traefik.etcd.tls.key:
+    description: |
+      Etcd key
+  traefik.etcd.tls.insecureSkipVerify:
+    description: |
+      Etcd insecureSkipVerify

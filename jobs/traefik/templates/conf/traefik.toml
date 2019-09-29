@@ -937,3 +937,54 @@ filename = "/var/vcap/jobs/traefik/conf/rules.toml"
 #
 watch = <%= p('traefik.file.watch') %>
 <% end -%>
+<% if p('traefik.etcd.enabled') -%>
+################################################################
+# File backend configuration
+################################################################
+[etcd]
+
+# Etcd server endpoint.
+#
+# Required
+# Default: "127.0.0.1:2379"
+#
+endpoint = "<%= p("traefik.etcd.endpoint") %>"
+
+# Enable watch Etcd changes.
+#
+# Optional
+# Default: true
+#
+watch = <%= p("traefik.etcd.watch") %>
+
+# Prefix used for KV store.
+#
+# Optional
+# Default: "/traefik"
+#
+prefix = "<%= p("traefik.etcd.prefix") %>"
+
+# Override default configuration template.
+# For advanced users :)
+#
+# Optional
+#
+# filename = "etcd.tmpl"
+
+# Use etcd user/pass authentication.
+#
+# Optional
+<% if !p("traefik.etcd.credentials").compact.empty? -%>
+username = "<%= p("traefik.etcd.credentials.username") %>"
+password = "<%= p("traefik.etcd.credentials.password") %>"
+<% end -%>
+
+# Enable etcd TLS connection.
+#
+# Optional
+#
+<% if !p("traefik.etcd.tls").compact.empty? -%>
+  [etcd.tls]
+    insecureSkipVerify = <%= p("traefik.etcd.tls.insecureSkipVerify","true") %>
+<% end -%>
+<% end -%> 
