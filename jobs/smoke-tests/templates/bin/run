@@ -6,13 +6,24 @@
     end
 
     traefik = link("traefik")
-    if not traefik.p('traefik.api.enabled') # Smoke tests do require the API to be activated
+    if not traefik.p('traefik.api.enabled') or not traefik.p('traefik.rest.enabled')
+        # Smoke tests do require the API and the REST backend to be activated
+        if not traefik.p('traefik.api.enabled')
 -%>
-echo "ERROR: smoke tests require the API to be enabled." \
-    "Please set the 'traefik.api.enabled' property of the 'teraefik' job to 'true'. Aborting."
+echo "FATAL: smoke tests require the API to be enabled." \
+    "Please set the 'traefik.api.enabled' property of the 'teraefik' job to 'true'."
+<%
+        end
+        if not traefik.p('traefik.rest.enabled')
+-%>
+echo "FATAL: smoke tests require the REST provider to be enabled." \
+    "Please set the 'traefik.rest.enabled' property of the 'teraefik' job to 'true'."
+<%
+        end
+-%>
 exit 1
 <%
-    else # if p('traefik.api.enabled')
+    else # if p('traefik.api.enabled') and traefik.p('traefik.rest.enabled')
 
         adm_username = traefik.p("traefik.api.digest_auth.username")
         adm_password = traefik.p("traefik.api.digest_auth.password")
@@ -205,5 +216,5 @@ echo $'\n'
 
 exit 0
 <%
-    end # if p('traefik.api.enabled')
+    end # if p('traefik.api.enabled') and traefik.p('traefik.rest.enabled')
 -%>

@@ -33,6 +33,7 @@ provides:
       - traefik.api.tls.cert
       - traefik.api.digest_auth.username
       - traefik.api.digest_auth.password
+      - traefik.rest.enabled
 
 properties:
   bpm.enabled:
@@ -204,7 +205,8 @@ properties:
 
   traefik.web.enabled:
     description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
+      DEPRECATED. See 'traefik.api.*' and 'traefik.rest.enabled' properties
+      instead.
 
       Whether the 'web' backend should be enabled.
 
