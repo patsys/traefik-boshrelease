@@ -269,6 +269,14 @@ InsecureSkipVerify = <%= p('traefik.accept_invalid_backend_certificates') %>
   address = ":443"
     [entryPoints.https.tls]
     minVersion = "<%= p('traefik.tls.min_version') %>"
+<% if p('traefik.mtls.enabled') -%>
+      [entryPoints.https.tls.ClientCA]
+<%   if_p('traefik.mtls.cert') do |cert| -%>
+        files = <%= cert.to_json() %>
+<% end %>
+        optional = <% p(traefik.mtls.optional) %>
+<% end %>
+
 <%   if_p('traefik.tls.cert') do |cert| -%>
       [[entryPoints.https.tls.certificates]]
       CertFile = "/var/vcap/jobs/traefik/tls/traefik-default.crt"

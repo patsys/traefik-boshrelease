@@ -130,6 +130,23 @@ properties:
     default: VersionTLS12
 
 
+  traefik.mtls.enabled:
+    description: |
+      Whether to activate the HTTPS entrypoint.
+    default: false
+  traefik.mtls.certs:
+    description: |
+      array of client certs
+  traefik.mtls.optional:
+    description: |
+      mtls is optional
+    dafault: true
+  traefik.mtls.passCert:
+    description: |
+      pass Client cert in Header
+    dafault: true
+
+
   traefik.acme.enabled:
     description: |
       Whether to activate automatic Let's Encrypt certificates.
