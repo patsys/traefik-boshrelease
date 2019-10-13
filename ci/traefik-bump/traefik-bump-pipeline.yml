@@ -18,7 +18,7 @@ resources:
       owner: containous
       repository: traefik
       pre_release: false
-      tag_filter: v(\d+\.\d+\.\d+)
+      tag_filter: v(1\.\d+\.\d+)
       access_token: ((github_access_token))
 
   - name: traefik-boshrelease-master

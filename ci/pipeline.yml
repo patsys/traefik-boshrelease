@@ -69,7 +69,7 @@ meta:
     deployment-pr: (( concat meta.name "-testflight-pr" ))
 
   compiled-release:
-    stemcell_version_family: "250"
+    stemcell_version_family: "456"
 
   slack:
     webhook:       (( param "Please specify your Slack Incoming Webhook Integration URL" ))
