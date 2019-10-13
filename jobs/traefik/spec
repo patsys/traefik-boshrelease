@@ -11,6 +11,9 @@ templates:
   conf/rules.toml: conf/rules.toml
   tls/traefik-default.crt: tls/traefik-default.crt
   tls/traefik-default.key: tls/traefik-default.key
+  tls/traefik-etcd-user.crt: tls/traefik-etcd-user.crt 
+  tls/traefik-etcd-user.key: tls/traefik-etcd-user.key
+  tls/traefik-etcd-user.ca: tls/traefik-etcd-user.ca
   tls/web-backend.crt: tls/web-backend.crt
   tls/web-backend.key: tls/web-backend.key
   tls/api-entrypoint.crt: tls/api-entrypoint.crt

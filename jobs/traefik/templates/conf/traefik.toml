@@ -987,9 +987,7 @@ username = "<%= p("traefik.etcd.credentials.username") %>"
 password = "<%= p("traefik.etcd.credentials.password") %>"
 <% end -%>
 
-<% if p("traefik.etcd.api_v3") %>
-useAPIV3 = true
-<% end %>
+useAPIV3 = <%= p("traefik.etcd.api_v3") %> 
 
 # Enable etcd TLS connection.
 #
@@ -997,15 +995,15 @@ useAPIV3 = true
 #
 <% if !p("traefik.etcd.tls").compact.empty? -%>
   [etcd.tls]
-    <% if_p("traefik.etcd.tls.ca") do |ca| %>
-    ca = "<%= ca.gsub(/\n/, "\\n") %>"
+    <% if_p("traefik.etcd.tls.ca") do |_| %>
+    ca = "/var/vcap/jobs/traefik/tls/traefik-etcd-user.ca"
     <% end %>
-    <% if_p("traefik.etcd.tls.key") do |key| %>
-    key = "<%= key.gsub(/\n/, "\\n") %>"
+    <% if_p("traefik.etcd.tls.key") do |_| %>
+    key = "/var/vcap/jobs/traefik/tls/traefik-etcd-user.key"
     <% end %>
-    <% if_p("traefik.etcd.tls.cert") do |cert| %>
-    cert = "<%= cert.gsub(/\n/, "\\n")  %>"
+    <% if_p("traefik.etcd.tls.cert") do |_| %>
+    cert = "/var/vcap/jobs/traefik/tls/traefik-etcd-user.crt"
     <% end %>
-    insecureSkipVerify = <%= p("traefik.etcd.tls.insecureSkipVerify","true") %>
+    insecureSkipVerify = <%= p("traefik.etcd.tls.insecureSkipVerify","false") %>
 <% end -%>
 <% end -%> 

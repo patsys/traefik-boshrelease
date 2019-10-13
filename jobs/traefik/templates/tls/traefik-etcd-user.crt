@@ -1,0 +1,1 @@
+<% if_p('traefik.etcd.tls.cert') do |cert| %><%= cert.strip %><% end %>

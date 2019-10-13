@@ -1,0 +1,196 @@
+---
+- type: replace
+  path: /name
+  value: ((deployment-name))
+
+- type: replace
+  path: /instance_groups/name=traefik/jobs/-
+  value:
+    name: etcd
+    release: cfcr-etcd
+    provides:
+      etcd: {as: etcd}
+    properties:
+      tls:
+        etcd:
+          ca: ((tls_etcd.ca))
+          certificate: ((tls_etcd.certificate))
+          private_key: ((tls_etcd.private_key))
+        etcdctl:
+          ca: ((tls_etcdctl.ca))
+          certificate: ((tls_etcdctl.certificate))
+          private_key: ((tls_etcdctl.private_key))
+        peer:
+          ca: ((tls_etcd_peer.ca))
+          certificate: ((tls_etcd_peer.certificate))
+          private_key: ((tls_etcd_peer.private_key))
+
+- type: replace
+  path: /instance_groups/-
+  value:
+     name: acceptance
+     azs: [z1]
+     instances: 1
+     lifecycle: errand
+     vm_type: default
+     stemcell: default
+     networks:
+     - name: default
+     jobs:
+     - name: acceptance-tests
+       release: cfcr-etcd
+       consumes:
+         etcd: {from: etcd}
+       properties:
+         tls:
+           etcd_client:
+             ca: ((tls_etcdctl.ca))
+             certificate: ((tls_etcdctl.certificate))
+             private_key: ((tls_etcdctl.private_key))
+
+- type: replace
+  path: /instance_groups/name=traefik/jobs/name=traefik/properties/traefik/etcd?
+  value:
+    api_v3: ((etcd_v3))
+    tls:
+      insecureSkipVerify: false
+      ca: ((tls_etcd.ca))
+      cert: ((tls_etcdctl.certificate))
+      key: ((tls_etcdctl.private_key))
+    enabled: true
+#      credentials:
+#        username: ((etcd_traefik_credentials.username))
+#        password: ((etcd_traefik_credentials.password))
+
+- type: replace
+  path: /instance_groups/name=traefik/networks
+  value:
+  - name: ((network_name))
+
+- type: replace
+  path: /instance_groups/name=acceptance/networks
+  value:
+  - name: ((network_name))
+
+- path: /variables/-
+  type: replace
+  value:
+    name: etcd_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: ca
+
+- type: replace
+  path: /variables/-
+  value:
+    name: tls_etcdctl
+    type: certificate
+    options:
+      ca: etcd_ca
+      common_name: localhost
+      alternative_names:
+      - "localhost"
+      - ((traefik_domain))
+      - "traefik.((network_name)).((deployment-name)).bosh"
+      - "*.traefik.((network_name)).((deployment-name)).bosh"
+
+- type: replace
+  path: /variables/-
+  value:
+    name: tls_etcd
+    type: certificate
+    options:
+      ca: etcd_ca
+      common_name: localhost
+      alternative_names:
+      - "localhost"
+      - ((traefik_domain))
+      - "traefik.((network_name)).((deployment-name)).bosh"
+      - "*.traefik.((network_name)).((deployment-name)).bosh"
+- type: replace
+  path: /variables/-
+  value:
+    name: tls_etcd_peer
+    type: certificate
+    options:
+      ca: etcd_ca
+      common_name: localhost
+      alternative_names:
+      - "localhost"
+      - ((traefik_domain))
+      - "traefik.((network_name)).((deployment-name)).bosh"
+      - "*.traefik.((network_name)).((deployment-name)).bosh"
+
+- path: /instance_groups/name=traefik/jobs/name=etcd/properties/users?/-
+  type: replace
+  value:
+    name: ((etcd_root_credentials.username))
+    password: ((etcd_root_credentials.password))
+    versions:
+    - v2
+- path: /variables/-
+  type: replace
+  value:
+    name: etcd_root_credentials
+    type: user
+    options:
+      username: root
+- path: /instance_groups/name=traefik/jobs/name=etcd/properties/tls/etcdctl-root?
+  type: replace
+  value:
+    ca: ((tls_etcdctl_root.ca))
+    certificate: ((tls_etcdctl_root.certificate))
+    private_key: ((tls_etcdctl_root.private_key))
+- path: /variables/-
+  type: replace
+  value:
+    name: tls_etcdctl_root
+    type: certificate
+    options:
+      ca: etcd_ca
+      common_name: root
+      extended_key_usage:
+      - client_auth
+- path: /variables/-
+  type: replace
+  value:
+    name: tls_etcd_traefik
+    type: certificate
+    options:
+      ca: etcd_ca
+      common_name: traefik
+      extended_key_usage:
+      - client_auth
+- path: /variables/-
+  type: replace
+  value:
+    name: etcd_traefik_credentials
+    type: user
+    options:
+      username: traefik
+- path: /instance_groups/name=traefik/jobs/name=etcd/properties/users?/-
+  type: replace
+  value:
+    name: ((etcd_traefik_credentials.username))
+    password: ((etcd_traefik_credentials.password))
+    versions:
+    - v2
+    permissions:
+      read:
+      - /traefik/*
+      write:
+      - /traefik/*
+
+- path: /instance_groups/name=traefik/jobs/name=etcd/provides/etcd/aliases?/-
+  type: replace
+  value:
+    domain: ((traefik_domain))
+
+- path: /releases/-
+  type: replace
+  value:
+    name: cfcr-etcd
+    version: "1.11.1"
+    url: "https://bosh.io/d/github.com/cloudfoundry-incubator/cfcr-etcd-release?v=1.11.1"
+    sha1: "5ff0104783202a287b7877883d9ff95f22e18eef"

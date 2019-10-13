@@ -1,76 +1,87 @@
----
-name: ((deployment_name))
-
+name: traefik
 instance_groups:
+- name: traefik
+  instances: 3
+  azs: 
+  - z1
+  - z2
+  - z3
+  jobs:
+  - name: bpm
+    release: bpm
   - name: traefik
-    instances: 1
-    azs: [ z1 ]
-    jobs:
-      - name: traefik
-        release: traefik
-        properties:
-          traefik:
-            log_level: INFO
-            access_logs: { enabled: true }
-            http: { enabled: true }
-            tls:
-              cert: ((traefik_tls))
-          bpm:
-            enabled: true
-      - name: bpm
-        release: bpm
-      - name: smoke-tests
-        release: traefik
-    stemcell: default
-    vm_type: default
-    persistent_disk_type: default
-    env:
-      bosh: { swap_size: 0 }
-    networks:
-      - name: ((network_name))
+    release: traefik
+    properties:
+      traefik:
+        api:
+          enabled: true
+          digest_auth:
+            username: ((traefik_api_credentials.username))
+            password: ((traefik_api_credentials.password))
+        log_level: INFO
+        access_logs: { enabled: true }
+        http: 
+          enabled: true
+          redirect_to_https: false
+        tls:
+          cert: 
+            ca: ((traefik_tls.ca))
+            certificate: ((traefik_tls.certificate))((traefik_tls.ca))
+            private_key: ((traefik_tls.private_key))
+        file:
+          enabled: true
+          rules: ""
+      bpm:
+        enabled: true
+  - name: smoke-tests
+    release: traefik
+  stemcell: default
+  vm_type: default
+  persistent_disk_type: 5GB
+  env:
+    bosh: { swap_size: 0 }
+  networks:
+  - name: ((network_name))
+    
 
 variables:
-  - name: traefikCA
-    type: certificate
-    options:
-      is_ca: true
-      common_name: traefikCA
+- name: traefikCA
+  type: certificate
+  options:
+    is_ca: true
+    common_name: traefikCA
 
-  - name: traefik_tls
-    type: certificate
-    options:
-      ca: traefikCA
-      common_name: ((traefik_domain))
-      alternative_names:
-        - ((traefik_domain))
-        - "*.((traefik_domain))"
+- name: traefik_tls
+  type: certificate
+  options:
+    ca: traefikCA
+    common_name: ((traefik_domain))
+    alternative_names:
+      - ((traefik_domain))
+      - "*.((traefik_domain))"
+
+- name: traefik_api_credentials
+  type: user
 
 features:
   use_dns_addresses: true
 
-update:
-  serial: true # instance groups to be deployed sequentially.
-
-  canaries: 1
-  canary_watch_time: 1000-5000
-
-  max_in_flight: 1
-  update_watch_time: 1000-5000
-
-stemcells:
-  - alias: default
-    os: ubuntu-xenial
-    version: latest
 
 releases:
 - name: traefik
-  sha1: 7562cc3da16f6b32aa8675d456e9d9c386b1eec9
-  stemcell:
-    os: ubuntu-xenial
-    version: "250.93"
-  url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.7.0-ubuntu-xenial-250.93-20190820-181214-043709721-20190820181215.tgz
-  version: 1.7.0
+  version: latest
 - name: bpm
-  sha1: 41df19697d6a69d2552bc2c132928157fa91abe0
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bpm-release?v=1.0.4
-  version: 1.0.4
+  sha1: b41556af773ea9aec93dd21a9bbf129200849eed
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.3
+  version: 1.1.3
+
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+
+update:
+  canaries: 1
+  canary_watch_time: 1000-30000
+  update_watch_time: 1000-30000
+  max_in_flight: 1
