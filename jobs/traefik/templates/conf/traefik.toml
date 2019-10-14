@@ -274,7 +274,7 @@ InsecureSkipVerify = <%= p('traefik.accept_invalid_backend_certificates') %>
 <%   if_p('traefik.mtls.cert') do |cert| -%>
         files = <%= cert.to_json() %>
 <% end %>
-        optional = <% p(traefik.mtls.optional) %>
+        optional = <%= p('traefik.mtls.optional') %>
 <% end %>
 
 <%   if_p('traefik.tls.cert') do |cert| -%>
@@ -956,7 +956,11 @@ watch = <%= p('traefik.file.watch') %>
 # Required
 # Default: "127.0.0.1:2379"
 #
-endpoint = "<%= p("traefik.etcd.endpoint") %>"
+<% if_link("etcd") do |etcd| -%>
+endpoint = "<%= etcd.instances.map{ |instance| "#{instance.address}:2379"}.join(',') %>"
+<% end.else_if_p("traefik.etcd.endpoint") do |etcd| -%>
+endpoint = "<%= etcd %>"
+<% end -%>
 
 # Enable watch Etcd changes.
 #

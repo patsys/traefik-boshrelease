@@ -1,4 +1,4 @@
-<% if_link("http_backend") do |backend| %>
+<% if_link("http_backend") do |backend| -%>
 [backends]
   [backends.autoconf]
     [backends.autoconf.servers]
@@ -24,11 +24,32 @@
     priority = 1
 <% if p('traefik.mtls.enabled') -%>
   [frontends.autoconf.passTLSClientCert]
-    pem = <%=  p("traefik.mtls.passCert") %>
+<% if p('traefik.mtls.passCert') -%>
+    pem = true
+        [frontends.autoconf.passTLSClientCert.infos]
+            notBefore = true
+            notAfter = true
+            [frontends.autoconf.passTLSClientCert.infos.subject]
+                country = true
+                domainComponent = true
+                province = true
+                locality = true
+                organization = true
+                commonName = true
+                serialNumber = true
+            [frontends.autoconf.passTLSClientCert.infos.issuer]
+                country = true
+                domainComponent = true
+                province = true
+                locality = true
+                organization = true
+                commonName = true
+                serialNumber = true
+<% end -%>
 <% end -%>
   [frontends.autoconf.routes]
     [frontends.autoconf.routes.catch-all-http]
       # Workaround for a catch-all rule:
       rule = "HostRegexp: {dummy:[-.[:alnum:]_]+}"
 <% end -%>
-<% if_p('traefik.file.rules') do |rules| %><%= rules %><% end %>
+<% if_p('traefik.file.rules') do |rules| -%><%= rules %><% end -%>

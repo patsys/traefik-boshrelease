@@ -26,6 +26,9 @@ consumes:
 - name: http_backend
   type: http-router
   optional: true
+- name: etcd
+  type: etcd
+  optional: true
 
 provides:
   - name: traefik
