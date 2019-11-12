@@ -35,11 +35,11 @@ case $1 in
         p('traefik.api.tls.port') < 1024
 -%>
         exec /var/vcap/packages/traefik/bin/traefik \
-            -c /var/vcap/jobs/traefik/conf/traefik.toml
+            --configFile=/var/vcap/jobs/traefik/conf/traefik.toml
 <% else -%>
         exec chpst -u vcap:vcap \
             /var/vcap/packages/traefik/bin/traefik \
-            -c /var/vcap/jobs/traefik/conf/traefik.toml
+            --configFile=/var/vcap/jobs/traefik/conf/traefik.toml
 <% end -%>
         ;;
     stop)

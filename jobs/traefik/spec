@@ -8,7 +8,11 @@ templates:
   bin/bpm-prestart: bin/bpm-prestart
   bpm.yml: config/bpm.yml
   conf/traefik.toml: conf/traefik.toml
-  conf/rules.toml: conf/rules.toml
+  conf/file.yml: conf/dist/file.yml
+  conf/auto_conf.yml: conf/dist/auto_conf.yml
+  conf/api.yml: conf/dist/api.yml
+  conf/default_cert.yml: conf/dist/default_cert.yml
+  conf/mtls.yml: conf/dist/mtls.yml
   tls/traefik-default.crt: tls/traefik-default.crt
   tls/traefik-default.key: tls/traefik-default.key
   tls/web-backend.crt: tls/web-backend.crt
@@ -36,8 +40,6 @@ provides:
       - traefik.api.enabled
       - traefik.api.tls.port
       - traefik.api.tls.cert
-      - traefik.api.digest_auth.username
-      - traefik.api.digest_auth.password
 
 properties:
   bpm.enabled:
@@ -46,6 +48,25 @@ properties:
       the benefit of improved security measures at runtime.
     default: false
 
+  traefik.mtls.enabled:
+    description: |
+      Whether to activate the HTTPS entrypoint.
+    default: false
+  traefik.mtls.certs:
+    description: |
+      array of client certs
+  traefik.mtls.clientAuthTypei:
+    description: |
+      mtls is optional
+    dafault: VerifyClientCertIfGiven
+  traefik.mtls.passCert:
+    description: |
+      pass Client cert in Header
+    dafault: true
+
+  traefik.files:
+    discription: |
+    map: key is filename and value is file content
   traefik.debug:
     description: |
       Whether to enable debug mode.
@@ -172,6 +193,10 @@ properties:
       Please take care not exposing this endpoint to the entire Internet,
       otherwise your server could get compromized by malicious users.
     default: false
+  traefik.api.domain:
+    description: |
+      domain for api endpoint
+    default: traefik.internal
   traefik.api.tls.port:
     description: |
       TCP port for the Traefik API and Dashboard.
@@ -184,17 +209,9 @@ properties:
     description: |
       The minimum TLS version to be used by the API and Dashboard entrypoint.
     default: VersionTLS12
-  traefik.api.digest_auth.realm:
-    description: |
-      Digest Auth realm to authenticate to when accessing the Traefik API and
-      Dashboard.
-    default: traefik
-  traefik.api.digest_auth.username:
+  traefik.api.digest_auth:
     description: |
       Digest Auth username to access the Traefik API and Dashboard.
-  traefik.api.digest_auth.password:
-    description: |
-      Digest Auth password to access the Traefik API and Dashboard.
 
 
   traefik.rest.enabled:
@@ -205,61 +222,6 @@ properties:
       API. Then the Traefik API is no more read-only, and the configuration
       can be modified dynamically through the API.
     default: false
-
-
-  traefik.web.enabled:
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      Whether the 'web' backend should be enabled.
-
-      This will enable a REST API endpoint and a web UI that can be used to
-      dynamically read or modify the Traefik configuration. Please take great
-      care not exposing this endpoint to the entire Internet, otherwise your
-      server could get compromized by malicious users.
-    default: false
-  traefik.web.basic_auth.username:
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      Basic Auth username to access the 'web' backend.
-  traefik.web.basic_auth.password:
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      Basic Auth password to access the 'web' backend.
-
-      This value will end up being (kind of) MD5-digested (like 'htpasswd'
-      does) before it is injected in Traefik config, so it will not appear in
-      clear-text on the BOSH-managed Traefik nodes.
-  traefik.web.readonly:
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      Whether the 'web' endpoint should be readonly, in which case the Traefik
-      configuration can only be read and not modified through this backend.
-    default: true
-  traefik.web.port:
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      TCP port for the 'web' backend.
-
-      We advise to set '8443' here when 'traefik.web.tls.enabled' is set to
-      'true'.
-    default: 8080
-  traefik.web.tls.enabled:
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      Whether to activate TLS for the 'web' backend.
-    default: false
-  traefik.web.tls.cert:
-    type: certificate
-    description: |
-      DEPRECATED. See 'traefik.api.*' properties instead.
-
-      The TLS certificate to use for the 'web' backend.
 
 
   traefik.file.enabled:
