@@ -11,6 +11,7 @@ templates:
   conf/file.yml: conf/dist/file.yml
   conf/auto_conf.yml: conf/dist/auto_conf.yml
   conf/api.yml: conf/dist/api.yml
+  conf/middlewares.yml: conf/dist/middlewares.yml
   conf/default_cert.yml: conf/dist/default_cert.yml
   conf/mtls.yml: conf/dist/mtls.yml
   tls/traefik-default.crt: tls/traefik-default.crt
@@ -193,10 +194,14 @@ properties:
       Please take care not exposing this endpoint to the entire Internet,
       otherwise your server could get compromized by malicious users.
     default: false
+  traefik.api.subdomain:
+    description: |
+      subdomain for api endpoint
+    default: traefik
   traefik.api.domain:
     description: |
       domain for api endpoint
-    default: traefik.internal
+    default: internal
   traefik.api.tls.port:
     description: |
       TCP port for the Traefik API and Dashboard.

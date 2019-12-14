@@ -5,15 +5,29 @@
   [entryPoints.web-secure]
     address = ":<%= p("traefik.tls.port") %>"
 
+<% if p("traefik.api.enabled") == true &&  p("traefik.api.tls.port") != p("traefik.tls.port") -%>
+  [entryPoints.api]
+    address = ":<%= p("traefik.api.tls.port") %>"
+<% end -%> 
+
 [providers]
   [providers.file]
     directory = "/var/vcap/jobs/traefik/conf/dist"
     watch = true
 
-<% if p("traefik.api.enabled") == "true" -%>
+<% if p("traefik.api.enabled") == true -%>
 [api]
-<% if p("traefik.api.tls.port") != p("traefik.tls.port") -%>
-  [entryPoints.api]
-    address = ":<%= p("traefik.api.tls.port") %>"
-<% end -%> 
+[ping]
+  entryPoint = "api"
+[metrics]
+  [metrics.prometheus]
+    entryPoint = "api"
+    addServicesLabels = true
+    addEntryPointsLabels = true
 <% end -%>
+[log]
+  filePath = "/var/vcap/sys/log/traefik/traefik.log"
+[accessLog]
+  filePath = "/var/vcap/sys/log/traefik/access.log"
+  bufferingSize = 100
+

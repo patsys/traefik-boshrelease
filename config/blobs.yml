@@ -1,4 +1,4 @@
-traefik/traefik_v2.0.4_linux_amd64.tar.gz:
-  size: 19306435
-  object_id: traefik_v2.0.4_linux_amd64.tar.gz
-  sha: sha256:43ccc8597b76f8d80c0b5831a3109a4d2b5b33d5d9108aeee847cf434c130c44
+traefik/traefik_v2.1.1_linux_amd64.tar.gz:
+  size: 19570838
+  object_id: traefik_v2.1.1_linux_amd64.tar.gz
+  sha: sha256:27d7e290f47d32619b7fe5eb2304ddc41aaffb1b4ed46307c4241c66272f20dc
