@@ -1,0 +1,5 @@
+<% if_p('traefik.files') do |content| -%>
+<% content.each do |k,v| -%>
+<%= v.to_yaml()  %>
+<% end -%>
+<% end -%>

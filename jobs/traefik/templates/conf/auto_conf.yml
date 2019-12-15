@@ -1,0 +1,27 @@
+<% if_link("http_backend") do |backend| -%>
+http:
+  routers:
+<% if p('traefik.tls.enabled') -%>
+    autoconf-https:
+      tls: {}
+      rule: "HostRegexp(`{dummy:[-.[:alnum:]_]+}`)"
+      service: autoconf
+      entryPoints:
+      - web-secure
+<% end -%>
+<% if p('traefik.http.enabled') -%>
+    autoconf-http:
+      rule: "HostRegexp(`{dummy:[-.[:alnum:]_]+}`)"
+      service: autoconf
+      entryPoints:
+      - web
+<% end -%>
+
+  services:
+    autoconf:
+      loadBalancer:
+        servers:
+        <% backend.instances.each_with_index do |instance,i| -%> 
+        - url: "http://<%= instance.address %>"
+        <% end -%>
+<% end -%>

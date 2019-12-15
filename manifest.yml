@@ -1,0 +1,97 @@
+name: traefik
+instance_groups:
+- name: traefik
+  instances: 1
+  azs: 
+  - z1
+  jobs:
+  - name: bpm
+    release: bpm
+  - name: traefik
+    release: traefik
+    consumes:
+      http_backend:
+        deployment: ((comsume_http_deployment))
+        from: http-router
+    properties:
+      traefik:
+        files:
+          evoila:
+            http:
+              routers:
+                evoila:
+                  entryPoints:
+                  - web-secure
+                  service: evoila
+              services:
+                evoila:
+                  loadBalancer:
+                    servers:
+                    - url: foobar
+        log_level: INFO
+        access_logs: { enabled: true }
+        http: 
+          enabled: true
+          redirect_to_https: false
+        tls:
+          cert: 
+            ca: ((traefik_tls.ca))
+            certificate: ((traefik_tls.certificate))((traefik_tls.ca))
+            private_key: ((traefik_tls.private_key))
+        file:
+          enabled: true
+          rules: ""
+      bpm:
+        enabled: true
+  - name: smoke-tests
+    release: traefik
+  stemcell: default
+  vm_type: default
+  persistent_disk_type: 5GB
+  env:
+    bosh: { swap_size: 0 }
+  networks:
+  - name: ((network_name))
+    
+
+variables:
+- name: traefikCA
+  type: certificate
+  options:
+    is_ca: true
+    common_name: traefikCA
+
+- name: traefik_tls
+  type: certificate
+  options:
+    ca: traefikCA
+    common_name: ((traefik_domain))
+    alternative_names:
+      - ((traefik_domain))
+      - "*.((traefik_domain))"
+
+- name: traefik_api_credentials
+  type: user
+
+features:
+  use_dns_addresses: true
+
+
+releases:
+- name: traefik
+  version: latest
+- name: bpm
+  sha1: b41556af773ea9aec93dd21a9bbf129200849eed
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.3
+  version: 1.1.3
+
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+
+update:
+  canaries: 1
+  canary_watch_time: 1000-30000
+  update_watch_time: 1000-30000
+  max_in_flight: 1

@@ -1,0 +1,39 @@
+<% if p("traefik.api.enabled") == true -%>
+http:
+  routers:
+    api-http:
+      rule: "HostRegexp(`<%= p("traefik.api.subdomain") %>.<%= p("traefik.api.domain") %>`,`{index:[0-9]+}.<%= p("traefik.api.subdomain") %>.<%= p("traefik.api.domain") %>`,`<%= p("traefik.api.subdomain") %>{index:[0-9]+}.<%= p("traefik.api.domain") %>`) && PathPrefix(`/dashboard`,`/api`)" 
+      service: api@internal
+      middlewares:
+      - redirect-api
+    api:
+      rule: "HostRegexp(`<%= p("traefik.api.subdomain") %>.<%= p("traefik.api.domain") %>`,`{index:[0-9]+}.<%= p("traefik.api.subdomain") %>.<%= p("traefik.api.domain") %>`,`<%= p("traefik.api.subdomain") %>{index:[0-9]+}.<%= p("traefik.api.domain") %>`) && PathPrefix(`/dashboard`,`/api`)" 
+      tls: {}
+      service: api@internal
+      entryPoints:
+<% if p("traefik.api.tls.port") != p("traefik.tls.port") -%>
+      - api
+<% else -%>
+      - web-secure
+<% end -%>
+<% if_p("traefik.api.digest_auth") do |auth|  %>
+<% require 'digest/md5' %>
+#      middlewares:
+#      - api_auth
+  middlewares:
+    redirect-api:
+      redirectScheme:
+        scheme: https
+        port: <%= p("traefik.api.tls.port") %>
+    api_auth: 
+      basicAuth:
+        users:
+<% auth.each do |credentials| -%>
+        - "<%= credentials['user'] %>:<%= Digest::MD5.hexdigest(credentials['password']) %>"
+<% end -%>
+<% end -%>
+tls:
+  certificates:
+  - certFile: /var/vcap/jobs/traefik/tls/api-entrypoint.crt
+    keyFile: /var/vcap/jobs/traefik/tls/api-entrypoint.key
+<% end %>

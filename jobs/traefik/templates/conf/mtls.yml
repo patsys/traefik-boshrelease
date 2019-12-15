@@ -1,0 +1,10 @@
+<% if p('traefik.mtls.enabled') -%>
+tls:
+  options:
+    default:
+      clientAuth:
+        <%   if_p('traefik.mtls.cert') do |cert| -%>
+        caFiles: <%= cert.to_json() %>
+        <% end -%>
+        clientAuthType: <%= p('traefik.mtls.clientAuthType') %>
+<% end -%>

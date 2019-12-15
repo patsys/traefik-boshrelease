@@ -1,0 +1,8 @@
+<% if_p('traefik.tls.cert') do |cert| -%>
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /var/vcap/jobs/traefik/tls/traefik-default.crt
+        keyFile: /var/vcap/jobs/traefik/tls/traefik-default.key
+<% end -%>
