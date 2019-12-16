@@ -1,0 +1,1 @@
+<% if_p('etcd.ca') do |ca| %><%= ca %><% end %>

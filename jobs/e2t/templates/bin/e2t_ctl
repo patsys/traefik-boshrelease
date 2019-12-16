@@ -1,0 +1,92 @@
+#!/bin/bash
+if [ "$1" == "stop" ]; then
+  kill $( cat /var/vcap/sys/run/e2t/e2t.pid )
+  exit 0
+fi
+
+mkdir /var/vcap/sys/run/e2t/
+echo "$$" > /var/vcap/sys/run/e2t/e2t.pid
+mkdir -p /var/vcap/sys/log/e2t/
+exec 1>> /var/vcap/sys/log/e2t/ctl.stdout.log
+exec 2>> /var/vcap/sys/log/e2t/ctl.stderr.log
+date +%F_%T 
+date +%F_%T >&2
+ctl=$(find /var/vcap/packages/*/bin -name etcdctl | head -n1 )
+if [ ! "$ctl" ];then
+  echo "etcdctl is need" 2>1
+  exit 1
+fi
+JOB_DIR="/var/vcap/jobs/e2t"
+parms=""
+<% if_p('etcd.ca') do |_| %>
+  params+=" --ca-file $JOB_DIR/tls/client.ca"
+<% end %>
+<% if_p('etcd.key','etcd.cert') do |_,_| %>
+  params+=" --cert-file $JOB_DIR/tls/client.crt --key-file $JOB_DIR/tls/client.key"
+<% end %>
+<% if_p('etcd.username','etcd.password') do |username,password| %>
+  params+=" --username \"<%= username %>:<%= password %>\""
+<% end %>
+etcdctl="$ctl --endpoints <%= p('etcd.endpoints') %> $params"
+i=0
+etcd_prefix="<%= p('etcd.prefix') %>"
+while [[ "$( $etcdctl ls $etcd_prefix )" =~ "error " ]]; do
+  echo "wait to connect etcd"
+  if [ "$i" == "20" ];then
+    echo "no etcd connection" >&2
+    exit 1
+  fi
+  ((i+=1))
+  sleep 15
+done
+  $etcdctl ls $etcd_prefix >/dev/null || $etcdctl mkdir $etcd_prefix  
+  $etcdctl ls $etcd_prefix/conf >/dev/null || $etcdctl mkdir $etcd_prefix/conf 
+  $etcdctl ls $etcd_prefix/key >/dev/null || $etcdctl mkdir $etcd_prefix/key
+  $etcdctl ls $etcd_prefix/cert >/dev/null || $etcdctl mkdir $etcd_prefix/cert
+file_prefix="<%= p('etcd.fileprefix') %>"
+mkdir -p $file_prefix/tls
+mkdir -p $file_prefix/dist
+rm $file_prefix/dist/etcd_*
+rm $file_prefix/dist/etcd_*
+for p in $( $etcdctl ls  $etcd_prefix/key ); do
+  echo "$( $etcdctl get $p )" > $file_prefix/tls/etcd_$( basename $p ).key
+done
+for p in $( $etcdctl ls  $etcd_prefix/cert ); do
+  echo "$( $etcdctl get $p )" > $file_prefix/tls/etcd_$( basename $p ).crt
+done
+for p in $( $etcdctl ls  $etcd_prefix/conf ); do
+  echo "$( $etcdctl get $p )" > $file_prefix/dist/etcd_$( basename $p ).yml
+done
+while true; do
+  etcd_change="$( $etcdctl watch -r $etcd_prefix)"
+  first_line="$( head -n1 <<< "$etcd_change" )"
+  etcd_typ="$( cut -d' ' -f1 <<< "$first_line" )"
+  etcd_path="$( cut -d' ' -f2 <<< "$first_line" )"
+  if [ "$etcd_typ" == "[delete]" ];then
+    if [[ "$etcd_path" =~ "cert" ]]; then
+      rm $file_prefix/tls/etcd_$(basename $etcd_path).crt
+    elif [[ "$etcd_path" =~ "key" ]]; then
+      rm $file_prefix/tls/etcd_$(basename $etcd_path).key
+    elif [[ "$etcd_path" =~ "conf" ]]; then
+      rm $file_prefix/dist/etcd_$(basename $etcd_path).yml
+    else
+      echo "wrong path($etcd_path)"
+      exit 1
+    fi
+  elif [ "$etcd_typ" == "[set]" ];then
+    content=$( tail -n +2 <<<"$etcd_change")
+    if [[ "$etcd_path" =~ "cert" ]]; then
+      echo "$content" > $file_prefix/tls/etcd_$(basename $etcd_path).crt
+    elif [[ "$etcd_path" =~ "key" ]]; then
+      echo "$content" > $file_prefix/tls/etcd_$(basename $etcd_path).key
+    elif [[ "$etcd_path" =~ "conf" ]]; then
+      echo "$content" > $file_prefix/dist/etcd_$(basename $etcd_path).yml
+    else
+      echo "wrong path($etcd_pathtls)"
+      exit 1
+    fi
+  else
+    echo "wrong type($etcd_typ) in etcd"
+    exit 1
+  fi
+done

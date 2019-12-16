@@ -176,6 +176,10 @@ properties:
       the production server.
     default: true
 
+  traefik.autoconf.priority:
+    description: |
+      Priority of autoconf route
+    default: 100
 
   traefik.api.enabled:
     description: |

@@ -1,0 +1,39 @@
+---
+name: e2t
+
+description: This job watch to etcd and transfair to traefik file backend
+
+templates:
+  bin/e2t_ctl: bin/e2t_ctl
+  tls/client.crt: tls/client.crt
+  tls/client.key: tls/client.key
+  tls/client.ca: tls/client.ca
+
+properties:
+  etcd.endpoints:
+    description: |
+      etcd host
+    default: https://localhost:2379
+  etcd.key:
+    description: |
+      etcd mtls private key
+  etcd.ca:
+    desicription: |
+      etcd ca
+  etcd.cert:
+    description: |
+      etcd mtls cert
+  etcd.username: 
+    description: |
+      etcd username
+  etcd.password: 
+    description: |
+      etcd password
+  etcd.prefix: 
+    description: |
+      etcd prefix
+    default: /e2t
+  etcd.fileprefix:
+    description: |
+      traefik folder
+    default: /var/vcap/jobs/traefik/conf

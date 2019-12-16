@@ -6,6 +6,7 @@ http:
       tls: {}
       rule: "HostRegexp(`{dummy:[-.[:alnum:]_]+}`)"
       service: autoconf
+      priority: <%= p('traefik.autoconf.priority') %>
       entryPoints:
       - web-secure
 <% end -%>
@@ -13,6 +14,7 @@ http:
     autoconf-http:
       rule: "HostRegexp(`{dummy:[-.[:alnum:]_]+}`)"
       service: autoconf
+      priority: <%= p('traefik.autoconf.priority') %>
       entryPoints:
       - web
 <% end -%>

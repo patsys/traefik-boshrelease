@@ -1,0 +1,5 @@
+check process e2t
+  with pidfile /var/vcap/sys/run/e2t/e2t.pid
+  start program "/var/vcap/jobs/e2t/bin/e2t_ctl start"
+        as gid vcap
+  stop program "/var/vcap/jobs/e2t/bin/e2t_ctl stop"
