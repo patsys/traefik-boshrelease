@@ -232,6 +232,9 @@ properties:
       can be modified dynamically through the API.
     default: false
 
+  traefik.auto_conf.http_port:
+    description: port user for http_backend link
+    default: 80
 
   traefik.file.enabled:
     description: |

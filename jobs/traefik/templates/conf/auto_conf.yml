@@ -24,6 +24,6 @@ http:
       loadBalancer:
         servers:
         <% backend.instances.each_with_index do |instance,i| -%> 
-        - url: "http://<%= instance.address %>"
+        - url: "http://<%= instance.address %><%= traefik.auto_conf.http_port %>"
         <% end -%>
 <% end -%>
