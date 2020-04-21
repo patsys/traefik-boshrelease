@@ -235,6 +235,24 @@ properties:
   traefik.auto_conf.http_port:
     description: port user for http_backend link
     default: 80
+  traefik.auto_conf.health_check.port:
+    description: port for healtcheck default http_backend port
+  traefik.auto_conf.health_check.enabled:
+    description: use healtcheck
+    default: true
+  traefik.auto_conf.health_check.scheme:
+    description: scheme for healtcheck
+    default: http
+  traefik.auto_conf.health_check.path:
+    description: path  for healtcheck
+    default: "/"
+  traefik.auto_conf.health_check.interval:
+    description: interval for healtcheck
+    default: 30s
+  traefik.auto_conf.health_check.timeout:
+    description: interval for healtcheck
+    default: 3s
+
 
   traefik.file.enabled:
     description: |

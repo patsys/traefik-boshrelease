@@ -24,6 +24,15 @@ http:
       loadBalancer:
         servers:
         <% backend.instances.each_with_index do |instance,i| -%> 
-        - url: "http://<%= instance.address %><%= traefik.auto_conf.http_port %>"
+        - url: "http://<%= instance.address %>:<%= p("traefik.auto_conf.http_port") %>"
         <% end -%>
+<% if p("traefik.auto_conf.health_check.enabled") == true -%>
+
+        healthCheck:
+          path:  <%= p("traefik.auto_conf.health_check.path") %>
+          interval: <%= p("traefik.auto_conf.health_check.interval") %>
+          timeout: <%=  p("traefik.auto_conf.health_check.timeout") %>
+          scheme: <%=  p("traefik.auto_conf.health_check.scheme") %>
+          port: <%=  p(["traefik.auto_conf.health_check.port","traefik.auto_conf.http_port"]) %>
+<% end -%>
 <% end -%>
